@@ -450,10 +450,11 @@
                 </div>
 
                 <!-- Expanded Y-Axis Layout: Larger field prevents truncated strings -->
+                <!-- Expanded Y-Axis Layout: Large step allows swift adjustments to large balances -->
                 <div class="advanced-row-y">
                     <div class="control-group y-input-wrap">
                         <label class="control-label">Chart Max Net Worth ($)</label>
-                        <input type="number" id="box-y-max" value="" placeholder="Auto (Peak Net Worth)">
+                        <input type="number" id="box-y-max" step="100000" min="0" value="" placeholder="Auto (Peak Net Worth)">
                     </div>
                     <button class="btn-lock" id="btn-lock-y" title="Toggle vertical net worth bounds lock">Lock Current</button>
                 </div>
@@ -515,7 +516,25 @@
         if (boxYMax.value !== "") {
             boxYMax.value = "";
         } else if (computedPeakCache > 0) {
-            boxYMax.value = Math.round(computedPeakCache);
+            const rawPeak = computedPeakCache;
+            let snappedCeiling = Math.round(rawPeak);
+
+            // Dynamic Rounding Scale based on Net Worth magnitude
+            if (rawPeak >= 1000000) {
+                // Greater than $1M: Snap up to the next clean $250,000 interval
+                snappedCeiling = Math.ceil(rawPeak / 250000) * 250000;
+            } else if (rawPeak >= 250000) {
+                // Between $250k and $1M: Snap up to the next clean $50,000 interval
+                snappedCeiling = Math.ceil(rawPeak / 50000) * 50000;
+            } else if (rawPeak >= 50000) {
+                // Between $50k and $250k: Snap up to the next clean $10,000 interval
+                snappedCeiling = Math.ceil(rawPeak / 10000) * 10000;
+            } else {
+                // Under $50k: Snap up to the next clean $5,000 interval
+                snappedCeiling = Math.ceil(rawPeak / 5000) * 5000;
+            }
+
+            boxYMax.value = snappedCeiling;
         }
         updateVisualization();
     });
