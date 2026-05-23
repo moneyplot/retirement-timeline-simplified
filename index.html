@@ -421,10 +421,10 @@
             </div>
 
             <div class="control-group">
-                <label class="control-label">Real Growth Rate (%)</label>
+                <label class="control-label" id="label-growth">Real Growth Rate: 3%</label>
                 <div class="interactive-row">
                     <input type="range" id="input-growth" min="-3.0" max="7.0" step="0.5" value="3.0">
-                    <input type="number" id="box-growth" class="manual-box" min="-5.0" max="15.0"step="0.1" value="3.0">
+                    <input type="number" id="box-growth" class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
                 </div>
             </div>
 
@@ -503,7 +503,6 @@
     const mWorkYears = document.getElementById('metric-work-years');
     const mRetireAge = document.getElementById('metric-retire-age');
     const mPeakNw = document.getElementById('metric-peak-nw');
-    
 
     let chartInstance = null;
     let computedPeakCache = 0;
@@ -552,8 +551,6 @@
         updateVisualization();
     });
 
-    boxLegacyFloor.addEventListener('change', updateVisualization);
-
     function updateButtonStates() {
         if (boxAxisMin.value !== "" || boxAxisMax.value !== "") {
             btnLockX.textContent = "Unlock Auto";
@@ -580,6 +577,7 @@
         params.set('savings', boxSavings.value);
         params.set('spending', boxSpending.value);
         params.set('growth', boxGrowth.value);
+        params.set('legacyFloor', boxLegacyFloor.value);
         if(boxAxisMin.value !== "") params.set('xMin', boxAxisMin.value);
         if(boxAxisMax.value !== "") params.set('xMax', boxAxisMax.value);
         if(boxYMax.value !== "") params.set('yMax', boxYMax.value);
@@ -596,6 +594,7 @@
         if (params.has('savings')) boxSavings.value = inputSavings.value = params.get('savings');
         if (params.has('spending')) boxSpending.value = inputSpending.value = params.get('spending');
         if (params.has('growth')) boxGrowth.value = inputGrowth.value = params.get('growth');
+        if (params.has('legacyFloor')) boxLegacyFloor.value = sliderLegacyFloor.value = params.get('legacyFloor');
         if (params.has('xMin')) boxAxisMin.value = params.get('xMin');
         if (params.has('xMax')) boxAxisMax.value = params.get('xMax');
         if (params.has('yMax')) boxYMax.value = params.get('yMax');
@@ -723,6 +722,7 @@
         document.getElementById('label-principal').innerText = 'Starting Balance: ' + formatCurrency(p0);
         document.getElementById('label-savings').innerText = 'Annual Savings: ' + formatCurrency(c) + '/yr';
         document.getElementById('label-spending').innerText = 'Annual Retirement Spending: ' + formatCurrency(b) + '/yr';
+        document.getElementById('label-growth').innerText = 'Real Growth Rate: ' + (r * 100).toFixed(1) + '%';
         document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(floor);
 
         const results = calculateTimeline(startAge, endAge, p0, c, b, r);
@@ -824,8 +824,8 @@
         });
     }
 
-    // Custom linking function for legacy bounds to preserve the wide input scale
-    function linkInputsLegacy(slider, box) {
+    // Custom Decoupled Link Engine for asymmetric ranges (e.g. Growth)
+    function linkInputsDecoupled(slider, box, sMin, sMax, bMin, bMax) {
         slider.addEventListener('input', () => {
             box.value = slider.value;
             updateVisualization();
@@ -834,22 +834,25 @@
             if (box.value === "") box.value = slider.value;
             
             let val = parseFloat(box.value);
-            if (val < 0) { val = 0; box.value = "0"; }
-            if (val > 5000000) { val = 5000000; box.value = "5000000"; }
+            if (val < bMin) { val = bMin; box.value = bMin.toFixed(1); }
+            if (val > bMax) { val = bMax; box.value = bMax.toFixed(1); }
 
-            // Slider visually clamps to $1M max, box retains full customized target value
-            slider.value = Math.max(0, Math.min(1000000, val));
+            slider.value = Math.max(sMin, Math.min(sMax, val));
             updateVisualization();
         });
     }
 
+
+    // Clean, bulletproof, decoupled bindings for every single asset variable
+    linkInputsDecoupled(inputPrincipal, boxPrincipal, 0, 1000000, 0, 10000000);  // Slider $1M, Box max $10M
+    linkInputsDecoupled(inputSavings, boxSavings, 0, 100000, 0, 1000000);       // Slider $100k, Box max $1M
+    linkInputsDecoupled(inputSpending, boxSpending, 0, 100000, 0, 1000000);     // Slider $100k, Box max $1M
+    linkInputsDecoupled(inputGrowth, boxGrowth, -3.0, 7.0, -5.0, 15.0);          // Slider 7%, Box max 15%
+    linkInputsDecoupled(sliderLegacyFloor, boxLegacyFloor, 0, 1000000, 0, 5000000); // Slider $1M, Box max $5M
+
+    // Standard 1:1 linking is perfectly fine for ages since slider and box share identical 0-120 bounds
     linkInputs(sliderStartAge, boxStartAge);
     linkInputs(sliderEndAge, boxEndAge);
-    linkInputs(inputPrincipal, boxPrincipal);
-    linkInputs(inputSavings, boxSavings);
-    linkInputs(inputSpending, boxSpending);
-    linkInputs(inputGrowth, boxGrowth);
-    linkInputsLegacy(sliderLegacyFloor, boxLegacyFloor);
 
     boxAxisMin.addEventListener('change', updateVisualization);
     boxAxisMax.addEventListener('change', updateVisualization);
