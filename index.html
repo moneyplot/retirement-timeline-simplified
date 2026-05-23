@@ -287,13 +287,77 @@
         .btn-lock.locked:hover {
             background-color: rgba(239, 68, 68, 0.3);
         }
+
+        .doc-footer {
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        @media (min-width: 768px) {
+            .doc-footer {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        .doc-notes {
+            flex: 1;
+            max-width: 650px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .doc-notes strong {
+            color: var(--text-main);
+        }
+        .doc-links {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .btn-doc {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(51, 65, 85, 0.4);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .btn-doc:hover {
+            background-color: rgba(51, 65, 85, 0.8);
+            border-color: var(--accent-blue);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Money Plot Labs: The Pure Math of Freedom</h2>
-    
+    <div class="doc-footer">
+        <div class="doc-notes">
+            <p><strong>Pure Math Framework:</strong> All figures are calculated in <strong>today's dollars</strong> (inflation-adjusted). The default <strong>3.0% real growth rate</strong> is an idealized long-term structural baseline. It intentionally mirrors conservative historical safe-withdrawal frameworks (like the 4% rule) to protect against sequence-of-returns risk during your drawdown phase.</p>
+        </div>
+        <div class="doc-links">
+            <a href="./docs/the-pure-math-of-financial-freedom.pdf" target="_blank" class="btn-doc">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                View Mathematical Derivations (PDF)
+            </a>
+            <a href="https://github.com/moneyplot/retirement-timeline-simplified" target="_blank" class="btn-doc">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                View Source on GitHub
+            </a>
+        </div>
+    </div>
     <div class="metrics-grid">
         <div class="metric-card">
             <div class="metric-label">Working Years Needed</div>
