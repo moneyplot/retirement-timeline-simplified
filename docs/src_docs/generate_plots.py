@@ -27,7 +27,7 @@ A_start = 20
 A_end = 95
 H = A_end - A_start  # Horizon = 75 years
 
-P0 = 0               # Initial Balance
+A_0 = 0               # Initial Balance
 L = 0           # Desired Legacy Floor (Actuary-aligned L notation)
 c = 10000            # Annual Savings Flow
 b = 50000            # Annual Retirement Budget
@@ -35,21 +35,21 @@ b = 50000            # Annual Retirement Budget
 # =========================================================================
 # GRAPH 1: THE LINEAR BASELINE (r = 0%)
 # =========================================================================
-w_linear = (b * H + L - P0) / (c + b)
+w_linear = (b * H + L - A_0) / (c + b)
 age_retire_linear = A_start + w_linear
-P_w_linear = P0 + c * w_linear
+A_w_linear = A_0 + c * w_linear
 
 ages_lin = np.arange(A_start, A_end + 1)
-nw_lin = [P0 + c * t if t <= w_linear else L + b * (H - t) for t in (ages_lin - A_start)]
+nw_lin = [A_0 + c * t if t <= w_linear else L + b * (H - t) for t in (ages_lin - A_start)]
 
 fig1, ax1 = plt.subplots(figsize=(7, 4.2), layout='tight')
 split_idx = int(np.floor(w_linear)) + 1
 ax1.plot(ages_lin[:split_idx], nw_lin[:split_idx], color=mp_green, linewidth=3, label='Linear Accumulation')
 ax1.plot(ages_lin[split_idx-1:], nw_lin[split_idx-1:], color=mp_red, linewidth=3, label='Linear Depletion')
 
-ax1.plot(age_retire_linear, P_w_linear, marker='o', color=mp_dark, markersize=8, zorder=5)
-ax1.annotate(f'Peak $P_w$\nAge {age_retire_linear:.1f}\n${int(P_w_linear):,}', 
-             xy=(age_retire_linear, P_w_linear), xytext=(age_retire_linear, P_w_linear + 140000),
+ax1.plot(age_retire_linear, A_w_linear, marker='o', color=mp_dark, markersize=8, zorder=5)
+ax1.annotate(f'Peak $A_w$\nAge {age_retire_linear:.1f}\n${int(A_w_linear):,}', 
+             xy=(age_retire_linear, A_w_linear), xytext=(age_retire_linear, A_w_linear + 140000),
              color=mp_dark, weight='bold', ha='center', arrowprops=dict(arrowstyle='->', color=mp_dark, lw=1))
 
 ax1.text(50, 280000, f'Slope = +$c$\n(${c:,}/yr)', color=mp_green, weight='bold', ha='center', rotation=22)
@@ -76,7 +76,7 @@ plt.close()
 # GRAPH 2: THE EXPONENTIAL ENGINE (r = 5%)
 # =========================================================================
 r = 0.03
-numerator_inner = (r * P0 + c) * ((1 + r)**H) + b * (1 + r) - r * L
+numerator_inner = (r * A_0 + c) * ((1 + r)**H) + b * (1 + r) - r * L
 denominator_inner = c + b * (1 + r)
 w_exponential = H - (np.log(numerator_inner / denominator_inner) / np.log(1 + r))
 age_retire_exp = A_start + w_exponential
@@ -86,14 +86,14 @@ nw_exp = []
 for age in ages_eval:
     t = age - A_start
     if t <= w_exponential:
-        val = P0 * ((1 + r)**t) + c * (((1 + r)**t - 1) / r)
+        val = A_0 * ((1 + r)**t) + c * (((1 + r)**t - 1) / r)
     else:
-        P_w_exp = P0 * ((1 + r)**w_exponential) + c * (((1 + r)**w_exponential - 1) / r)
+        A_w_exp = A_0 * ((1 + r)**w_exponential) + c * (((1 + r)**w_exponential - 1) / r)
         t_ret = t - w_exponential
-        val = P_w_exp * ((1 + r)**t_ret) - b * (((1 + r)**(t_ret + 1) - (1 + r)) / r)
+        val = A_w_exp * ((1 + r)**t_ret) - b * (((1 + r)**(t_ret + 1) - (1 + r)) / r)
     nw_exp.append(val)
 
-P_w_exponential = nw_exp[np.argmin(np.abs((ages_eval - A_start) - w_exponential))]
+A_w_exponential = nw_exp[np.argmin(np.abs((ages_eval - A_start) - w_exponential))]
 
 fig2, ax2 = plt.subplots(figsize=(7, 4.2), layout='tight')
 mask_acc = ages_eval - A_start <= w_exponential
@@ -102,14 +102,14 @@ mask_dep = ages_eval - A_start >= w_exponential
 ax2.plot(ages_eval[mask_acc], np.array(nw_exp)[mask_acc], color=mp_green, linewidth=3, label='Exponential Accumulation')
 ax2.plot(ages_eval[mask_dep], np.array(nw_exp)[mask_dep], color=mp_red, linewidth=3, label='Exponential Depletion')
 
-ax2.plot(age_retire_exp, P_w_exponential, marker='o', color=mp_dark, markersize=8, zorder=5)
-ax2.annotate(f'Peak $P_w$\nAge {age_retire_exp:.1f}\n${int(P_w_exponential):,}', 
-             xy=(age_retire_exp, P_w_exponential), xytext=(age_retire_exp - 20, P_w_exponential - 100000),
+ax2.plot(age_retire_exp, A_w_exponential, marker='o', color=mp_dark, markersize=8, zorder=5)
+ax2.annotate(f'Peak $A_w$\nAge {age_retire_exp:.1f}\n${int(A_w_exponential):,}', 
+             xy=(age_retire_exp, A_w_exponential), xytext=(age_retire_exp - 20, A_w_exponential - 100000),
              color=mp_dark, weight='bold', ha='center', arrowprops=dict(arrowstyle='->', color=mp_dark, lw=1))
 
 # Dynamic curve rate tags (differential calculus markers)
-ax2.text(33, 220000, r'$\frac{dP}{dt} = rP + c$', color=mp_green, weight='bold', ha='center', fontsize=11, rotation=22)
-ax2.text(75, 500000, r'$\frac{dR}{dt} = rR - b(1+r)$', color=mp_red, weight='bold', ha='center', fontsize=11, rotation=-45)
+ax2.text(33, 220000, r'$\frac{dA}{dt} = rA + c$', color=mp_green, weight='bold', ha='center', fontsize=11, rotation=22)
+ax2.text(75, 450000, r'$\frac{dA}{dt} = rA - b(1+r)$', color=mp_red, weight='bold', ha='center', fontsize=11, rotation=-50)
 
 ax2.annotate('', xy=(A_start, 50000), xytext=(age_retire_exp, 50000), arrowprops=dict(arrowstyle='<->', color=mp_dark, lw=1))
 ax2.text((A_start + age_retire_exp)/2, 85000, f'Working Phase\n$w = {w_exponential:.1f}$ yrs', color=mp_dark, ha='center', weight='bold', fontsize=9)
