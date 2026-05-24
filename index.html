@@ -383,8 +383,8 @@
             <div class="control-group">
                 <label class="control-label">Current Age</label>
                 <div class="interactive-row">
-                    <input type="range" id="slider-start-age" min="0" max="120" value="20">
-                    <input type="number" id="box-start-age" class="manual-box" min="0" max="120" value="20">
+                    <input type="range" id="slider-start-age" min="0" max="120" value="25">
+                    <input type="number" id="box-start-age" class="manual-box" min="0" max="120" value="25">
                 </div>
             </div>
 
@@ -407,16 +407,16 @@
             <div class="control-group">
                 <label class="control-label" id="label-savings">Annual Savings: $10,000/yr</label>
                 <div class="interactive-row">
-                    <input type="range" id="input-savings" min="0" max="100000" step="2000" value="10000">
-                    <input type="number" id="box-savings" class="manual-box" min="0" step="1000" value="10000">
+                    <input type="range" id="input-savings" min="0" max="100000" step="2000" value="15000">
+                    <input type="number" id="box-savings" class="manual-box" min="0" step="1000" value="15000">
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" id="label-spending">Annual Retirement Spending: $50,000/yr</label>
                 <div class="interactive-row">
-                    <input type="range" id="input-spending" min="0" max="100000" step="2000" value="50000">
-                    <input type="number" id="box-spending" class="manual-box" min="0" step="1000" value="50000">
+                    <input type="range" id="input-spending" min="0" max="100000" step="2000" value="45000">
+                    <input type="number" id="box-spending" class="manual-box" min="0" step="1000" value="45000">
                 </div>
             </div>
 
@@ -612,23 +612,23 @@
         return balance;
     }
 
-    function calculateTimeline(startAge, endAge, p0, c, b, r) {
+    function calculateTimeline(startAge, endAge, a0, s, c, r) {
         const totalHorizon = endAge - startAge;
         const floor = parseFloat(boxLegacyFloor.value) || 0; // Capture the legacy floor
         let w = 0;
 
         if (totalHorizon <= 0) {
-            return { workingYears: 0, retirementAge: startAge, peakNetWorth: p0, accumulationData: [], depletionData: [] };
+            return { workingYears: 0, retirementAge: startAge, peakNetWorth: a0, accumulationData: [], depletionData: [] };
         }
 
         if (r === 0) {
             // Linear solver adjusted for baseline floor target
-            w = ((b * totalHorizon) + floor - p0) / (c + b);
+            w = ((c * totalHorizon) + floor - a0) / (s + c);
         } else {
             // Exponential compound solver factoring in the terminal legacy floor restriction
             const compoundHorizon = Math.pow(1 + r, totalHorizon);
-            const numerator = (r * p0 + c) * compoundHorizon + b - (r * floor);
-            const denominator = c + b;
+            const numerator = (r * a0 + s) * compoundHorizon + c - (r * floor);
+            const denominator = s + c;
             
             if (denominator === 0 || (numerator / denominator) <= 0) {
                 w = totalHorizon;
@@ -645,9 +645,9 @@
         
         let peakNetWorth = 0;
         if (r === 0) {
-            peakNetWorth = p0 + (c * w);
+            peakNetWorth = a0 + (s * w);
         } else {
-            peakNetWorth = p0 * Math.pow(1 + r, w) + c * (Math.pow(1 + r, w) - 1) / r;
+            peakNetWorth = a0 * Math.pow(1 + r, w) + s * (Math.pow(1 + r, w) - 1) / r;
         }
 
         for (let i = 0; i <= totalHorizon; i++) {
@@ -656,9 +656,9 @@
             if (i <= w) {
                 let bal = 0;
                 if (r === 0) {
-                    bal = p0 + (c * i);
+                    bal = a0 + (s * i);
                 } else {
-                    bal = p0 * Math.pow(1 + r, i) + c * (Math.pow(1 + r, i) - 1) / r;
+                    bal = a0 * Math.pow(1 + r, i) + s * (Math.pow(1 + r, i) - 1) / r;
                 }
                 accumulationData.push({ x: currentAgePos, y: bal });
             } 
@@ -667,9 +667,9 @@
                 const yearsRetired = i - w;
                 let bal = 0;
                 if (r === 0) {
-                    bal = peakNetWorth - (b * yearsRetired);
+                    bal = peakNetWorth - (c * yearsRetired);
                 } else {
-                    bal = peakNetWorth * Math.pow(1 + r, yearsRetired) - b * (Math.pow(1 + r, yearsRetired) - 1) / r;
+                    bal = peakNetWorth * Math.pow(1 + r, yearsRetired) - c * (Math.pow(1 + r, yearsRetired) - 1) / r;
                 }
                 // Clamp the depletion visualization cleanly to the user's legacy floor parameter
                 depletionData.push({ x: currentAgePos, y: Math.max(floor, bal) });
