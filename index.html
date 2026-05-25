@@ -466,7 +466,10 @@
                 </div>
                 <!-- Decumulation Growth Rate Control -->
                 <div class="control-group" style="margin-top: 8px;">
-                    <label class="control-label" id="label-growth-dec">Real Growth Rate (Decumulation): 3.0%</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label class="control-label" id="label-growth-dec">Real Growth Rate (Decumulation): 3.0%</label>
+                        <button class="btn-lock" id="btn-link-rates" style="width: auto; height: 24px; padding: 0 8px; font-size: 0.75rem;">Link to Accumulation</button>
+                    </div>
                     <div class="interactive-row">
                         <input type="range" id="input-growth-dec" min="-3.0" max="7.0" step="0.5" value="3.0">
                         <input type="number" id="box-growth-dec" class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
@@ -504,6 +507,7 @@
     const boxSpending = document.getElementById('box-spending');
     const boxGrowth = document.getElementById('box-growth');
     const boxGrowthDec = document.getElementById('box-growth-dec');
+        const btnLinkRates = document.getElementById('btn-link-rates');
 
     const btnAdvanced = document.getElementById('advanced-button');
     const panelAdvanced = document.getElementById('advanced-panel');
@@ -522,12 +526,41 @@
 
     let chartInstance = null;
     let computedPeakCache = 0;
+        let ratesLinked = false;
     const formatCurrency = (num) => '$' + Math.round(num).toLocaleString();
 
     btnAdvanced.addEventListener('click', () => {
         btnAdvanced.classList.toggle('open');
         panelAdvanced.classList.toggle('visible');
     });
+
+        btnLinkRates.addEventListener('click', () => {
+            ratesLinked = !ratesLinked;
+            if (ratesLinked) {
+                btnLinkRates.textContent = "Rates Linked";
+                btnLinkRates.classList.add('locked');
+                
+                // Snap decumulation values to accumulation
+                boxGrowthDec.value = boxGrowth.value;
+                inputGrowthDec.value = inputGrowth.value;
+                
+                // Disable decumulation inputs
+                inputGrowthDec.disabled = true;
+                boxGrowthDec.disabled = true;
+            } else {
+                btnLinkRates.textContent = "Link to Accumulation";
+                btnLinkRates.classList.remove('locked');
+                
+                // Re-enable inputs
+                inputGrowthDec.disabled = false;
+                boxGrowthDec.disabled = false;
+            }
+            updateVisualization();
+        });
+
+        // Ensure UI stays in sync when accumulation growth changes while linked
+        inputGrowth.addEventListener('input', () => { if(ratesLinked) { inputGrowthDec.value = boxGrowthDec.value = inputGrowth.value; } });
+        boxGrowth.addEventListener('change', () => { if(ratesLinked) { inputGrowthDec.value = boxGrowthDec.value = boxGrowth.value; } });
 
     btnLockX.addEventListener('click', () => {
         if (boxAxisMin.value !== "" || boxAxisMax.value !== "") {
