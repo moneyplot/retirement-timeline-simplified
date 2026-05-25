@@ -69,13 +69,14 @@ H = w + f
     \setlength{\itemsep}{1pt}
     \setlength{\parskip}{0pt}
     \setlength{\parsep}{0pt}
-    \item $s$: Annual Savings Flow (\$)
-    \item $c$: Annual Consumption Outflow (\$)
-    \item $w$: Accumulation Years (Work)
-    \item $f$: Decumulation Years (Freedom)
-    \item $r$: Inflation-Adjusted Real Growth Rate
-    \item $A_0$: Initial Net Worth / Balance (\$)
-    \item $L$: Desired Legacy Floor Target (\$)
+    \item \textcolor{mpbrown}{$I$}: Annual Earned Income (\textcolor{mpbrown}{$I$} = \textcolor{mpgreen}{$s$} + \textcolor{mpred}{$c$}) (\$)
+    \item \textcolor{mpgreen}{$s$}: Annual Savings Flow (\$)
+    \item \textcolor{mpred}{$c$}: Annual Consumption Outflow (\$)
+    \item \textcolor{mppurple}{$r$}: Inflation-Adjusted Real Growth Rate
+    \item \textcolor{mpblue}{$A_0$}: Initial Net Worth Starting Balance (\$)
+    \item{\textcolor{mpgreen}{$w$}: Accumulation Horizon (Working Years)
+    \item \textcolor{mpred}{$f$}: Decumulation Horizon (Freedom Years)
+    \item \textcolor{mpdark}{$L$}: Desired Legacy Floor Target (\$)
 \end{itemize}
 \end{multicols}
 
@@ -96,48 +97,49 @@ Before introducing the compounding curves of financial markets, we establish int
     \includegraphics[width=\linewidth]{linear_plot.pdf}
     \captionsetup{textfont=small}
     \caption{The straight-line boundary crossover mapping where $r =0\%$. Assets accumulate smoothly via \textcolor{mpgreen}{savings} and deplete symmetrically via \textcolor{mpred}{consumption} until hitting the legacy boundary.}
+    \vspace{1em}
 \end{wrapfigure}
-\vspace{2em}
+
 We begin with a simplified world containing a zero starting balance ($A_0 = 0$) and no terminal inheritance target ($L = 0$). 
 
-During the working phase, assets grow linearly via cash savings flow $c$ injected at the end of each period for $w$ years:
+During the working phase, assets grow linearly via cash savings flow ${\color{mpgreen}s}$ injected at the end of each period for $w$ years:
 \begin{equation}
-\text{Peak Assets Case 1} = s \cdot w
+\text{Peak Assets Case 1} = {\textcolor{mpgreen}s} \cdot w
 \end{equation}
 
-Upon entering retirement, accumulation stops decumulation begins draining our peak nest egg by a flat annual budget block $b$ for the remaining $f$ retirement years:
+Upon entering retirement, accumulation stops decumulation begins draining our peak nest egg by a flat annual consumption $\textcolor{mpred}{c}$ for the remaining $f$ retirement years:
 \begin{equation}
-\text{Peak Assets Required Case 1} = c \cdot f
+\text{Peak Assets Required Case 1} = {\textcolor{mpred}c} \cdot f
 \end{equation}
 
 To locate the precise intersection boundary where working ends and retirement begins, we enforce our system constraint where the peak accumulated capital must exactly equal the total retirement drawdown:
 \begin{equation}
-s \cdot w = c \cdot f
+{\textcolor{mpgreen}s} \cdot w = {\textcolor{mpred}c} \cdot f
 \end{equation}
 
 Substituting our timeline identity $f = H - w$ allows us to solve for $w$:
 \begin{equation}
-s \cdot w = c \cdot (H - w)
+{\textcolor{mpgreen}s} \cdot w = \textcolor{mpred}{c} \cdot (H - w)
 \end{equation}
 
 Grouping terms containing our target variable $w$ onto the left-hand side and factoring yields:
 \begin{equation}
-w(s + c) = c \cdot H
+w({\textcolor{mpgreen}s} + \textcolor{mpred}{c}) = \textcolor{mpred}{c} \cdot H
 \end{equation}
 
 Dividing through isolates our fundamental idealized baseline relationship:
 \begin{equation}
-w = \frac{c \cdot H}{s + c}
+w = \frac{\textcolor{mpred}{c} \cdot H}{\textcolor{mpgreen}s + \textcolor{mpred}{c}} =\frac{\textcolor{mpred}{c} \cdot H}{\textcolor{mpbrown}{I}}
 \end{equation}
-In the example in Figure 1, a person saving 25\% of their \$60,000/year income: $c = \$45,000\text{/year}$, $s = \$15,000\text{/year}$, 
+In the example in Figure 1, a person saving 25\% of their income: $\textcolor{mpbrown}{I} = \$60,000\text{/year}$, $\textcolor{mpred}{c} = \$45,000\text{/year}$, ${\textcolor{mpgreen}s} = \$15,000\text{/year}$, 
 $T_{start} = \text{25 years}$, $T_{end} = \text{95 years}$:
 \begin{align*}
-    w &= \frac{\$45,000 \cdot 70 \text{ years}}{\$45,000 + \$15,000}\\
+    w &= \frac{\textcolor{mpred}{\$45,000} \cdot 70 \text{ years}}{\textcolor{mpbrown}{\$60,000}}\\
     w &= 52.5 \text{ years}
 \end{align*}
 Another way to look at it is that the total area of the \textcolor{mpred}{consumption} bar chart should equal the area under the \textcolor{mpbrown}{earned income} line. 
 \begin{equation}
-{\color{mpbrown}I} * w = {\color{mpred}c} * H
+{\color{mpbrown}I} * w = \textcolor{mpred}{c} * H
 \end{equation}
 Equivalently, the  area of the \textcolor{mpgreen}{savings} bars is equal to the post retirement \textcolor{mpred}{consumption} bars.
 
