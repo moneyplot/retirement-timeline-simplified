@@ -375,9 +375,15 @@
     </div>
 
     <div class="layout-split">
-        <div class="chart-container">
-            <canvas id="timelineChart"></canvas>
-        </div>
+        <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Visual Timeline</span>
+                    <button class="btn-lock" id="main-chart-lock" style="height: 28px; padding: 0 12px; font-size: 0.8rem; width: auto;">Lock Scale for Comparison</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
 
         <div class="controls">
             <div class="control-group">
@@ -629,7 +635,7 @@
             const compoundHorizon = Math.pow(1 + r, totalHorizon);
             const numerator = (r * a0 + s) * compoundHorizon + c * (1 + r) - (r * floor);
             const denominator = s + c * (1 + r);
-                    
+
             if (denominator === 0 || (numerator / denominator) <= 0) {
                 w = totalHorizon;
             } else {
@@ -841,7 +847,40 @@
             updateVisualization();
         });
     }
+    
+    // Centralized locking mechanism for streamlined user experience
+    const mainLockBtn = document.getElementById('main-chart-lock');
 
+    mainLockBtn.addEventListener('click', () => {
+        // Check if currently unlocked
+        if (boxAxisMin.value === "" && boxYMax.value === "") {
+            // Lock X-Axis to current ages
+            boxAxisMin.value = parseInt(boxStartAge.value) || 0;
+            boxAxisMax.value = parseInt(boxEndAge.value) || 95;
+            
+            // Lock Y-Axis to cleanly snapped ceiling
+            if (computedPeakCache > 0) {
+                const rawPeak = computedPeakCache;
+                let snappedCeiling = Math.round(rawPeak);
+                if (rawPeak >= 1000000) snappedCeiling = Math.ceil(rawPeak / 250000) * 250000;
+                else if (rawPeak >= 250000) snappedCeiling = Math.ceil(rawPeak / 50000) * 50000;
+                else snappedCeiling = Math.ceil(rawPeak / 10000) * 10000;
+                boxYMax.value = snappedCeiling;
+            }
+            
+            mainLockBtn.textContent = "Unlock Auto-Scale";
+            mainLockBtn.classList.add('locked');
+        } else {
+            // Clear all constraints to restore default auto-scaling
+            boxAxisMin.value = "";
+            boxAxisMax.value = "";
+            boxYMax.value = "";
+            
+            mainLockBtn.textContent = "Lock Scale for Comparison";
+            mainLockBtn.classList.remove('locked');
+        }
+        updateVisualization();
+    });
 
     // Clean, bulletproof, decoupled bindings for every single asset variable
     linkInputsDecoupled(inputPrincipal, boxPrincipal, 0, 1000000, 0, 10000000);  // Slider $1M, Box max $10M
