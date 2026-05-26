@@ -345,9 +345,8 @@
     <h2>Money Plot Labs: The Pure Math of Freedom</h2>
     <div class="doc-footer">
         <div class="doc-notes">
-            <p><strong>Pure Math Framework:</strong> All figures are calculated in <strong>today's dollars</strong> (inflation-adjusted). The default <strong>3.0% real growth rate during accumulation</strong> means your investments grow by 3% <em>on top of</em> inflation (e.g., if inflation is 2%, your nominal return is 5%). This conservative baseline is structurally designed to mirror real-world safety nets like the <a href="https://www.bogleheads.org/wiki/Trinity_study" target="_blank" style="color: var(--accent-blue); text-decoration: underline;">4% Rule</a>.</p>
+            <p><strong>Pure Math Framework:</strong> All figures are calculated in <strong>today's dollars</strong> (inflation-adjusted). The default <strong>3.0% real growth rate during accumulation and decumulation</strong> means your investments grow by 3% <em>on top of</em> inflation (e.g., if inflation is 2%, your nominal return is 5%). This conservative baseline is structurally designed to mirror real-world safety nets like the <a href="https://www.bogleheads.org/wiki/Trinity_study" target="_blank" style="color: var(--accent-blue); text-decoration: underline;">4% Rule</a>.</p>
             <p>While <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html" target="_blank" style="color: var(--accent-blue); text-decoration: underline;">historic portfolios</a> (e.g., a balanced mix of 60% stocks and 40% bonds) average a long-term 5.7% real growth rate (approximately 8.8% nominal minus 3.1% inflation), they carry a 9.5% standard deviation. This volatility creates a "Sequence of Returns" risk—if the stock market crashes right as you retire, a fixed 5.7% assumption fails. Dropping the baseline to a smooth 3.0% real growth rate during accumulation mathematically simulates that volatility buffer, ensuring your plan survives severe market downturns.</p>
-            <p><strong>Bifurcated Growth Rates:</strong> This model supports independent growth rates for the working and retirement phases. By unlinking these rates in the Advanced Parameters, you can simulate a "glide path" transition from growth-oriented assets while working to more conservative, capital-preservation assets (e.g., bonds) in retirement.</p>
         </div>
         <div class="doc-links">
             <a href="./docs/001-the-pure-math-of-financial-freedom.pdf" target="_blank" class="btn-doc">
@@ -485,6 +484,11 @@
                         <!-- Input box allows advanced targets up to $5M -->
                         <input type="number" id="box-legacy-floor" class="manual-box" min="0" max="5000000" step="50000" value="0" placeholder="$">
                     </div>
+                </div>
+
+                <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; border-top: 1px dashed var(--border); padding-top: 12px; margin-top: 8px;">
+                    <strong>Bifurcated Growth Rates:</strong> This model supports independent growth rates for the working and retirement phases. 
+                    By unlinking these, you can simulate a "glide path" transition from growth-oriented assets while working to more conservative, capital-preservation assets (e.g., bonds) in retirement. 3% for most time frames results in same retirement age as following 4% safe withdrawal rate rule.
                 </div>
             </div>
         </div>
@@ -664,7 +668,7 @@
         return balance;
     }
 
-    function calculateTimeline(startAge, endAge, a0, s, c, r) {
+    function calculateTimeline(startAge, endAge, a0, s, c, rAcc, rDec) {
         const totalHorizon = endAge - startAge;
         const floor = parseFloat(boxLegacyFloor.value) || 0; // Capture the legacy floor
         let w = 0;
@@ -673,55 +677,57 @@
             return { workingYears: 0, retirementAge: startAge, peakNetWorth: a0, accumulationData: [], depletionData: [] };
         }
 
-        if (r === 0) {
-            // Linear solver adjusted for baseline floor target
-            w = ((c * totalHorizon) + floor - a0) / (s + c);
+        const getAw = (testW) => {
+            if (rAcc === 0) return a0 + s * testW;
+            return a0 * Math.pow(1 + rAcc, testW) + s * (Math.pow(1 + rAcc, testW) - 1) / rAcc;
+        };
+
+        const getFinalBalance = (testW) => {
+            const aw = getAw(testW);
+            const f = totalHorizon - testW;
+            if (rDec === 0) return aw - c * f;
+            // Correct Annuity Due formula per whitepaper Equation 19
+            return aw * Math.pow(1 + rDec, f) - c * ((Math.pow(1 + rDec, f + 1) - (1 + rDec)) / rDec);
+        };
+
+        // Binary search for optimal working years w using bifurcated rates
+        const balAtH = getFinalBalance(totalHorizon);
+        const balAtZero = getFinalBalance(0);
+
+        if (balAtZero >= floor) {
+            w = 0;
+        } else if (balAtH < floor) {
+            w = totalHorizon;
         } else {
-            // Exponential compound solver factoring in the terminal legacy floor restriction
-            const compoundHorizon = Math.pow(1 + r, totalHorizon);
-            const numerator = (r * a0 + s) * compoundHorizon + c * (1 + r) - (r * floor);
-            const denominator = s + c * (1 + r);
-
-            if (denominator === 0 || (numerator / denominator) <= 0) {
-                w = totalHorizon;
-            } else {
-                w = totalHorizon - (Math.log(numerator / denominator) / Math.log(1 + r));
+            let low = 0, high = totalHorizon;
+            for (let i = 0; i < 60; i++) {
+                let mid = (low + high) / 2;
+                if (getFinalBalance(mid) < floor) low = mid;
+                else high = mid;
             }
+            w = (low + high) / 2;
         }
-
-        w = Math.max(0, Math.min(totalHorizon, w));
-        if (isNaN(w)) w = totalHorizon;
 
         const accumulationData = [];
         const depletionData = [];
-        
-        let peakNetWorth = 0;
-        if (r === 0) {
-            peakNetWorth = a0 + (s * w);
-        } else {
-            peakNetWorth = a0 * Math.pow(1 + r, w) + s * (Math.pow(1 + r, w) - 1) / r;
-        }
+        const peakNetWorth = getAw(w);
 
         for (let i = 0; i <= totalHorizon; i++) {
             const currentAgePos = startAge + i;
 
             if (i <= w) {
-                let bal = 0;
-                if (r === 0) {
-                    bal = a0 + (s * i);
-                } else {
-                    bal = a0 * Math.pow(1 + r, i) + s * (Math.pow(1 + r, i) - 1) / r;
-                }
+                let bal = getAw(i);
                 accumulationData.push({ x: currentAgePos, y: bal });
             } 
             
             if (i >= Math.floor(w)) {
                 const yearsRetired = i - w;
                 let bal = 0;
-                if (r === 0) {
+                if (rDec === 0) {
                     bal = peakNetWorth - (c * yearsRetired);
                 } else {
-                    bal = peakNetWorth * Math.pow(1 + r, yearsRetired) - c * (Math.pow(1 + r, yearsRetired) - 1) / r;
+                    // Correct Annuity Due formula per whitepaper
+                    bal = peakNetWorth * Math.pow(1 + rDec, yearsRetired) - c * ((Math.pow(1 + rDec, yearsRetired + 1) - (1 + rDec)) / rDec);
                 }
                 // Clamp the depletion visualization cleanly to the user's legacy floor parameter
                 depletionData.push({ x: currentAgePos, y: Math.max(floor, bal) });
@@ -733,7 +739,8 @@
             retirementAge: startAge + w,
             peakNetWorth: peakNetWorth,
             accumulationData: accumulationData,
-            depletionData: depletionData
+            depletionData: depletionData,
+            finalBalanceAtMaxWork: balAtH
         };
     }
 
@@ -779,11 +786,11 @@
         document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + (rDec * 100).toFixed(1) + '%';
         document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(floor);
 
-        const results = calculateTimeline(startAge, endAge, p0, c, b, r);
+        const results = calculateTimeline(startAge, endAge, p0, c, b, r, rDec);
         computedPeakCache = results.peakNetWorth;
 
         mWorkYears.innerText = results.workingYears.toFixed(1) + ' Years';
-        mRetireAge.innerText = results.workingYears === (endAge - startAge) && evaluateEndingBalance(endAge - startAge, endAge - startAge, p0, c, b, r) < 0 ? 'Never' : 'Age ' + results.retirementAge.toFixed(1);
+        mRetireAge.innerText = results.workingYears >= (endAge - startAge) && results.finalBalanceAtMaxWork < floor ? 'Never' : 'Age ' + results.retirementAge.toFixed(1);
         mPeakNw.innerText = formatCurrency(results.peakNetWorth);
 
         let yMaxConstraint = boxYMax.value !== "" ? parseFloat(boxYMax.value) : undefined;
