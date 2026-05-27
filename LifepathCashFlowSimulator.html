@@ -158,6 +158,95 @@
             border-color: var(--accent-blue);
         }
 
+        .interactive-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .interactive-row input[type="range"] {
+            flex: 1;
+        }
+
+        .interactive-row .manual-box {
+            width: 110px;
+            flex-shrink: 0;
+            text-align: left;
+        }
+
+        .advanced-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(51, 65, 85, 0.3);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            user-select: none;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+
+        .advanced-toggle:hover {
+            background: rgba(51, 65, 85, 0.5);
+        }
+
+        .advanced-toggle .chevron {
+            transition: transform 0.2s ease;
+            width: 12px;
+            height: 12px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .advanced-toggle.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .advanced-content {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            border: 1px dashed var(--border);
+            padding: 14px;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.2);
+        }
+
+        .advanced-content.visible {
+            display: flex;
+        }
+
+        .btn-lock {
+            background-color: var(--accent-blue);
+            color: var(--text-main);
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background 0.15s, color 0.15s;
+            text-align: center;
+        }
+
+        .btn-lock:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-lock.locked {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
         .input-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -233,11 +322,55 @@
         <!-- Right Side: Control Panel Placeholder -->
         <div class="controls">
             <div class="control-group">
-                <label class="control-label">Variable Flow Configuration</label>
-                <div class="placeholder-text">
-                    The lookup engine for non-uniform cash flows (one-time windfalls, variable yearly spending, and stochastic adjustments) will be implemented here in Step 2.
+                <label class="control-label">Life Expectancy</label>
+                <div class="interactive-row">
+                    <input type="range" id="slider-end-age" min="0" max="120" value="95">
+                    <input type="number" id="box-end-age" class="manual-box" min="0" max="120" value="95">
                 </div>
             </div>
+
+            <div class="control-group">
+                <label class="control-label" id="label-principal">Starting Balance: $0</label>
+                <div class="interactive-row">
+                    <input type="range" id="input-principal" min="0" max="1000000" step="10000" value="0">
+                    <input type="number" id="box-principal" class="manual-box" min="0" step="1000" value="0" placeholder="$">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" id="label-growth">Real Growth Rate during accumulation: 3.0%</label>
+                <div class="interactive-row">
+                    <input type="range" id="input-growth" min="-3.0" max="7.0" step="0.5" value="3.0">
+                    <input type="number" id="box-growth" class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
+                </div>
+            </div>
+
+            <div class="advanced-toggle" id="advanced-button">
+                <span>More Parameters</span>
+                <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            
+            <div class="advanced-content" id="advanced-panel">
+                <div class="control-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label class="control-label" id="label-growth-dec">Real Growth Rate (Decumulation): 3.0%</label>
+                        <button class="btn-lock" id="btn-link-rates" style="width: auto; height: 24px; padding: 0 8px; font-size: 0.75rem;">Link to Accumulation</button>
+                    </div>
+                    <div class="interactive-row">
+                        <input type="range" id="input-growth-dec" min="-3.0" max="7.0" step="0.5" value="3.0">
+                        <input type="number" id="box-growth-dec" class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" id="label-legacy-floor">Desired Legacy Floor: $0</label>
+                    <div class="interactive-row">
+                        <input type="range" id="slider-legacy-floor" min="0" max="1000000" step="50000" value="0">
+                        <input type="number" id="box-legacy-floor" class="manual-box" min="0" max="5000000" step="50000" value="0" placeholder="$">
+                    </div>
+                </div>
+            </div>
+
             <div id="milestone-container" class="milestone-list"></div>
             <button id="add-event-btn" class="btn-add-event">+ Add Life Event (Milestone)</button>
         </div>
@@ -248,8 +381,23 @@
     const milestoneContainer = document.getElementById('milestone-container');
     const addEventBtn = document.getElementById('add-event-btn');
     const loader = document.getElementById('chart-loader');
+
+    const sliderEndAge = document.getElementById('slider-end-age');
+    const boxEndAge = document.getElementById('box-end-age');
+    const inputPrincipal = document.getElementById('input-principal');
+    const boxPrincipal = document.getElementById('box-principal');
+    const inputGrowth = document.getElementById('input-growth');
+    const boxGrowth = document.getElementById('box-growth');
+    const inputGrowthDec = document.getElementById('input-growth-dec');
+    const boxGrowthDec = document.getElementById('box-growth-dec');
+    const btnLinkRates = document.getElementById('btn-link-rates');
+    const btnAdvanced = document.getElementById('advanced-button');
+    const panelAdvanced = document.getElementById('advanced-panel');
+    const sliderLegacyFloor = document.getElementById('slider-legacy-floor');
+    const boxLegacyFloor = document.getElementById('box-legacy-floor');
     
     let chartInstance = null;
+    let ratesLinked = false;
     
     // Internal data structure
     let milestones = [];
@@ -352,6 +500,44 @@
         
         chartInstance.update('none'); // Use 'none' for instant reactive feel
     }
+
+    function linkInputs(slider, box, labelUpdateFn) {
+        slider.addEventListener('input', () => {
+            box.value = slider.value;
+            if (labelUpdateFn) labelUpdateFn(slider.value);
+            updateSimulation();
+        });
+        box.addEventListener('change', () => {
+            if (box.value === "") box.value = slider.value;
+            slider.value = box.value;
+            if (labelUpdateFn) labelUpdateFn(box.value);
+            updateSimulation();
+        });
+    }
+
+    btnAdvanced.addEventListener('click', () => {
+        btnAdvanced.classList.toggle('open');
+        panelAdvanced.classList.toggle('visible');
+    });
+
+    btnLinkRates.addEventListener('click', () => {
+        ratesLinked = !ratesLinked;
+        if (ratesLinked) {
+            btnLinkRates.textContent = "Rates Linked";
+            btnLinkRates.classList.add('locked');
+            
+            boxGrowthDec.value = boxGrowth.value;
+            inputGrowthDec.value = inputGrowth.value;
+            inputGrowthDec.disabled = true;
+            boxGrowthDec.disabled = true;
+        } else {
+            btnLinkRates.textContent = "Link to Accumulation";
+            btnLinkRates.classList.remove('locked');
+            inputGrowthDec.disabled = false;
+            boxGrowthDec.disabled = false;
+        }
+        updateSimulation();
+    });
 
     function createMilestoneUI(milestone) {
         const block = document.createElement('div');
@@ -486,6 +672,32 @@
         
         addMilestone(lastAge + 10, lastIncome, lastSavings, lastSpending);
     });
+
+    const formatCurrency = (num) => '$' + Math.round(num).toLocaleString();
+
+    linkInputs(sliderEndAge, boxEndAge);
+    linkInputs(inputPrincipal, boxPrincipal, (val) => {
+        document.getElementById('label-principal').innerText = 'Starting Balance: ' + formatCurrency(val);
+    });
+    linkInputs(inputGrowth, boxGrowth, (val) => {
+        document.getElementById('label-growth').innerText = 'Real Growth Rate during accumulation: ' + parseFloat(val).toFixed(1) + '%';
+        if (ratesLinked) {
+            inputGrowthDec.value = boxGrowthDec.value = val;
+            document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + parseFloat(val).toFixed(1) + '%';
+        }
+    });
+    linkInputs(inputGrowthDec, boxGrowthDec, (val) => {
+        document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + parseFloat(val).toFixed(1) + '%';
+    });
+    linkInputs(sliderLegacyFloor, boxLegacyFloor, (val) => {
+        document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(val);
+    });
+
+    // Set initial labels
+    document.getElementById('label-principal').innerText = 'Starting Balance: ' + formatCurrency(boxPrincipal.value);
+    document.getElementById('label-growth').innerText = 'Real Growth Rate during accumulation: ' + parseFloat(boxGrowth.value).toFixed(1) + '%';
+    document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + parseFloat(boxGrowthDec.value).toFixed(1) + '%';
+    document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(boxLegacyFloor.value);
 
     // Initialize with default
     addMilestone(30, 60000, 15000, 45000);
