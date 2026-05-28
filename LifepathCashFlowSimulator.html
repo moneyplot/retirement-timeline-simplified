@@ -716,6 +716,66 @@
         chartInstance.options.scales.yNetWorth.max = yMaxConstraint;
         
         chartInstance.update('none'); // Use 'none' for instant reactive feel
+        updateURLParams();
+    }
+
+    function updateURLParams() {
+        const params = new URLSearchParams();
+        params.set('startAge', boxStartAge.value);
+        params.set('endAge', boxEndAge.value);
+        params.set('principal', boxPrincipal.value);
+        params.set('growth', boxGrowth.value);
+        params.set('growthDec', boxGrowthDec.value);
+        params.set('legacyFloor', boxLegacyFloor.value);
+        params.set('linked', ratesLinked);
+        if(boxAxisMin.value !== "") params.set('xMin', boxAxisMin.value);
+        if(boxAxisMax.value !== "") params.set('xMax', boxAxisMax.value);
+        if(boxYMax.value !== "") params.set('yMax', boxYMax.value);
+        
+        // Compact milestones for URL: [age, income, savings, spending]
+        const mData = milestones.map(m => [m.age, m.income, m.savings, m.spending]);
+        params.set('m', JSON.stringify(mData));
+        
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState({}, '', newUrl);
+    }
+
+    function loadParamsFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('startAge')) boxStartAge.value = sliderStartAge.value = params.get('startAge');
+        if (params.has('endAge')) boxEndAge.value = sliderEndAge.value = params.get('endAge');
+        if (params.has('principal')) boxPrincipal.value = inputPrincipal.value = params.get('principal');
+        if (params.has('growth')) boxGrowth.value = inputGrowth.value = params.get('growth');
+        if (params.has('growthDec')) boxGrowthDec.value = inputGrowthDec.value = params.get('growthDec');
+        if (params.has('legacyFloor')) boxLegacyFloor.value = sliderLegacyFloor.value = params.get('legacyFloor');
+        if (params.has('xMin')) boxAxisMin.value = params.get('xMin');
+        if (params.has('xMax')) boxAxisMax.value = params.get('xMax');
+        if (params.has('yMax')) boxYMax.value = params.get('yMax');
+        
+        if (params.get('linked') === 'true') {
+            ratesLinked = true;
+            btnLinkRates.textContent = "Rates Linked";
+            btnLinkRates.classList.add('locked');
+            inputGrowthDec.disabled = boxGrowthDec.disabled = true;
+        }
+
+        if (boxAxisMin.value !== "" || boxYMax.value !== "") {
+            mainLockBtn.textContent = "Unlock Auto-Scale";
+            mainLockBtn.classList.add('locked');
+        }
+
+        if (params.has('m')) {
+            try {
+                const mData = JSON.parse(params.get('m'));
+                milestones = mData.map(m => ({
+                    id: Math.random().toString(36).substr(2, 9),
+                    age: m[0],
+                    income: m[1],
+                    savings: m[2],
+                    spending: m[3]
+                }));
+            } catch (e) { console.error("Failed to parse milestones from URL", e); }
+        }
     }
 
     function linkInputs(slider, box, labelUpdateFn) {
@@ -948,8 +1008,13 @@
     boxAxisMax.addEventListener('change', updateSimulation);
     boxYMax.addEventListener('change', updateSimulation);
 
-    // Initialize with default
-    addMilestone(30, 60000, 15000, 45000);
+    // Initialize
+    loadParamsFromURL();
+    if (milestones.length === 0) {
+        addMilestone(30, 60000, 15000, 45000);
+    } else {
+        renderMilestones();
+    }
 </script>
 </body>
 </html>
