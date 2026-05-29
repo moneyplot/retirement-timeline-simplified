@@ -726,6 +726,24 @@
         updateURLParams();
     }
 
+    function updateButtonStates() {
+        if (boxAxisMin.value !== "" || boxAxisMax.value !== "") {
+            btnLockX.textContent = "Unlock Auto";
+            btnLockX.classList.add('locked');
+        } else {
+            btnLockX.textContent = "Lock Current";
+            btnLockX.classList.remove('locked');
+        }
+
+        if (boxYMax.value !== "") {
+            btnLockY.textContent = "Unlock Auto";
+            btnLockY.classList.add('locked');
+        } else {
+            btnLockY.textContent = "Lock Current";
+            btnLockY.classList.remove('locked');
+        }
+    }
+
     function updateURLParams() {
         const params = new URLSearchParams();
         params.set('startAge', boxStartAge.value);
@@ -862,10 +880,14 @@
                 else snappedCeiling = Math.ceil(rawPeak / 10000) * 10000;
                 boxYMax.value = snappedCeiling;
             }
+            mainLockBtn.textContent = "Unlock Auto-Scale";
+            mainLockBtn.classList.add('locked');
         } else {
             boxAxisMin.value = "";
             boxAxisMax.value = "";
             boxYMax.value = "";
+            mainLockBtn.textContent = "Lock Scale for Comparison";
+            mainLockBtn.classList.remove('locked');
         }
         updateSimulation();
     });
