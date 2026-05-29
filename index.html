@@ -740,13 +740,13 @@
         return balance;
     }
 
-    function calculateTimeline(startAge, endAge, a0, s, c, rAcc, rDec) {
-        const totalHorizon = endAge - startAge;
+    function calculateTimeline(currentAge, stopAge, a0, s, c, rAcc, rDec) {
+        const totalHorizon = stopAge - currentAge;
         const floor = parseFloat(boxLegacyFloor.value) || 0; // Capture the legacy floor
         let w = 0;
 
         if (totalHorizon <= 0) {
-            return { workingYears: 0, retirementAge: startAge, peakNetWorth: a0, accumulationData: [], depletionData: [] };
+            return { workingYears: 0, retirementAge: currentAge, peakNetWorth: a0, accumulationData: [], depletionData: [] };
         }
 
         const getAw = (testW) => {
@@ -785,7 +785,7 @@
         const peakNetWorth = getAw(w);
 
         for (let i = 0; i <= totalHorizon; i++) {
-            const currentAgePos = startAge + i;
+            const currentAgePos = currentAge + i;
 
             if (i <= w) {
                 let bal = getAw(i);
@@ -808,7 +808,7 @@
 
         return {
             workingYears: w,
-            retirementAge: startAge + w,
+            retirementAge: currentAge + w,
             peakNetWorth: peakNetWorth,
             accumulationData: accumulationData,
             depletionData: depletionData,
@@ -817,30 +817,30 @@
     }
 
     function updateVisualization() {
-        let startAge = parseInt(boxStartAge.value) || 0;
-        let endAge = parseInt(boxEndAge.value) || 95;
+        let currentAge = parseInt(boxStartAge.value) || 0;
+        let stopAge = parseInt(boxEndAge.value) || 95;
         
-        let axisMin = boxAxisMin.value !== "" ? parseInt(boxAxisMin.value) : startAge;
-        let axisMax = boxAxisMax.value !== "" ? parseInt(boxAxisMax.value) : endAge;
+        let axisMin = boxAxisMin.value !== "" ? parseInt(boxAxisMin.value) : currentAge;
+        let axisMax = boxAxisMax.value !== "" ? parseInt(boxAxisMax.value) : stopAge;
 
-        if (isNaN(axisMin)) axisMin = startAge;
-        if (isNaN(axisMax)) axisMax = endAge;
+        if (isNaN(axisMin)) axisMin = currentAge;
+        if (isNaN(axisMax)) axisMax = stopAge;
 
         if (axisMin >= axisMax) {
             axisMax = axisMin + 10;
             if(boxAxisMax.value !== "") boxAxisMax.value = axisMax;
         }
 
-        if (startAge >= endAge) {
-            endAge = startAge + 1;
-            if(endAge > 120) {
-                endAge = 120;
-                startAge = 119;
-                boxStartAge.value = startAge;
-                sliderStartAge.value = startAge;
+        if (currentAge >= stopAge) {
+            stopAge = currentAge + 1;
+            if(stopAge > 120) {
+                stopAge = 120;
+                currentAge = 119;
+                boxStartAge.value = currentAge;
+                sliderStartAge.value = currentAge;
             }
-            boxEndAge.value = endAge;
-            sliderEndAge.value = endAge;
+            boxEndAge.value = stopAge;
+            sliderEndAge.value = stopAge;
         }
 
         const p0 = parseFloat(boxPrincipal.value) || 0;
@@ -858,11 +858,11 @@
         document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + (rDec * 100).toFixed(1) + '%';
         document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(floor);
 
-        const results = calculateTimeline(startAge, endAge, p0, c, b, r, rDec);
+        const results = calculateTimeline(currentAge, stopAge, p0, c, b, r, rDec);
         computedPeakCache = results.peakNetWorth;
 
         mWorkYears.innerText = results.workingYears.toFixed(1) + ' Years';
-        mRetireAge.innerText = results.workingYears >= (endAge - startAge) && results.finalBalanceAtMaxWork < floor ? 'Never' : 'Age ' + results.retirementAge.toFixed(1);
+        mRetireAge.innerText = results.workingYears >= (stopAge - currentAge) && results.finalBalanceAtMaxWork < floor ? 'Never' : 'Age ' + results.retirementAge.toFixed(1);
         mPeakNw.innerText = formatCurrency(results.peakNetWorth);
 
         let yMaxConstraint = boxYMax.value !== "" ? parseFloat(boxYMax.value) : undefined;
