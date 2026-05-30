@@ -973,6 +973,7 @@
         } else {
             boxAxisMin.value = parseInt(boxStartAge.value) || 0;
             boxAxisMax.value = parseInt(boxEndAge.value) || 95;
+            boxAxisMax.value = (parseInt(boxEndAge.value) || 95) + 1;
         }
         updateSimulation();
     });
@@ -996,6 +997,7 @@
         if (boxAxisMin.value === "" || boxAxisMax.value === "" || boxYMax.value === "") {
             boxAxisMin.value = parseInt(boxStartAge.value) || 0;
             boxAxisMax.value = parseInt(boxEndAge.value) || 95;
+            boxAxisMax.value = (parseInt(boxEndAge.value) || 95) + 1;
             
             if (computedPeakCache > 0) {
                 const rawPeak = computedPeakCache;

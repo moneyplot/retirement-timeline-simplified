@@ -670,7 +670,7 @@
             boxAxisMax.value = "";
         } else {
             boxAxisMin.value = parseInt(boxStartAge.value) || 0;
-            boxAxisMax.value = parseInt(boxEndAge.value) || 95;
+            boxAxisMax.value = (parseInt(boxEndAge.value) || 95) + 1;
         }
         updateVisualization();
     });
@@ -1039,7 +1039,7 @@
         if (boxAxisMin.value === "" && boxYMax.value === "") {
             // Lock X-Axis to current ages
             boxAxisMin.value = parseInt(boxStartAge.value) || 0;
-            boxAxisMax.value = parseInt(boxEndAge.value) || 95;
+            boxAxisMax.value = (parseInt(boxEndAge.value) || 95) + 1;
             
             // Lock Y-Axis to cleanly snapped ceiling
             if (computedPeakCache > 0) {
