@@ -817,7 +817,9 @@
                         bal = (balMid - (c - p) * (1 - delta)) * Math.pow(1 + rDec, 1 - delta);
                         peak = Math.max(peak, balMid, bal);
                         // Insert a mid-year point for visual clarity on the chart
-                        depData.push({ x: age + delta, y: Math.max(floor, balMid) });
+                        const midPoint = { x: age + delta, y: Math.max(floor, balMid) };
+                        accData.push(midPoint);
+                        depData.push(midPoint);
                     } else {
                         // Integer transition
                         depData.push({ x: age, y: Math.max(floor, bal) });
@@ -964,10 +966,11 @@
                     plugins: {
                         legend: { labels: { color: '#f8fafc' } },
                         tooltip: {
-                            mode: 'index',
+                            mode: 'nearest',
+                            axis: 'x',
                             intersect: false,
                             callbacks: {
-                                title: (context) => 'Age ' + context[0].parsed.x,
+                                title: (context) => 'Age ' + context[0].parsed.x.toFixed(1),
                                 label: (context) => context.raw !== null ? context.dataset.label + ': ' + formatCurrency(context.parsed.y) : null
                             }
                         }
