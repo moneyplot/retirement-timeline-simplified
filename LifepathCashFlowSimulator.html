@@ -619,18 +619,18 @@
                         stack: 'flow'
                     },
                     {
-                        label: 'Asset Growth',
-                        data: [],
-                        backgroundColor: 'rgba(139, 92, 246, 0.6)',
-                        borderColor: '#8B5CF6',
-                        borderWidth: 1,
-                        stack: 'flow'
-                    },
-                    {
                         label: 'Outflow (Spending)',
                         data: [],
                         backgroundColor: 'rgba(239, 68, 68, 0.6)',
                         borderColor: '#ef4444',
+                        borderWidth: 1,
+                        stack: 'flow'
+                    },
+                    {
+                        label: 'Asset Growth',
+                        data: [],
+                        backgroundColor: 'rgba(139, 92, 246, 0.6)',
+                        borderColor: '#8B5CF6',
                         borderWidth: 1,
                         stack: 'flow'
                     },
@@ -845,8 +845,8 @@
 
         chartInstance.data.labels = viewSim.labels;
         chartInstance.data.datasets[0].data = viewSim.inflowData;
-        chartInstance.data.datasets[1].data = viewSim.growthData;
-        chartInstance.data.datasets[2].data = viewSim.outflowData;
+        chartInstance.data.datasets[1].data = viewSim.outflowData;
+        chartInstance.data.datasets[2].data = viewSim.growthData;
         chartInstance.data.datasets[3].data = viewSim.nwData;
 
         chartInstance.options.scales.x.min = axisMin;
