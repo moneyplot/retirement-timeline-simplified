@@ -351,53 +351,6 @@
             border: 1px dashed var(--border);
             border-radius: 6px;
         }
-
-        .tools-nav {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin: 16px 0 24px 0;
-        }
-
-        @media (min-width: 768px) {
-            .tools-nav {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        .nav-item {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 12px;
-            border-radius: 8px;
-            background-color: rgba(15, 23, 42, 0.3);
-            border: 1px solid var(--border);
-            text-align: center;
-            transition: all 0.2s;
-            line-height: 1.4;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(51, 65, 85, 0.5);
-            color: var(--text-main);
-            border-color: var(--accent-blue);
-        }
-
-        .nav-item.active {
-            background-color: var(--accent-blue);
-            color: var(--text-main);
-            border-color: var(--accent-blue);
-        }
-
-        .nav-item span {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 400;
-            opacity: 0.7;
-            margin-top: 4px;
-        }
     </style>
 </head>
 <body>
@@ -514,48 +467,12 @@
                     <input type="number" id="box-y-max" step="100000" min="0" value="" placeholder="Auto (Peak Net Worth)">
                 </div>
                 <button class="btn-lock" id="btn-lock-y" style="width: 100%; margin-top: 4px;">Lock Current Y</button>
-
-                <!-- Dynamic External Events -->
-                <div style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <label class="control-label">Social Security / Pensions</label>
-                        <button class="btn-lock" id="btn-add-ss" style="width: auto; height: 24px; padding: 0 8px; font-size: 0.75rem;">+ Add</button>
-                    </div>
-                    <div id="ss-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
-                </div>
-
-                <div style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <label class="control-label">One-time Windfalls</label>
-                        <button class="btn-lock" id="btn-add-windfall" style="width: auto; height: 24px; padding: 0 8px; font-size: 0.75rem;">+ Add</button>
-                    </div>
-                    <div id="windfall-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
-                </div>
             </div>
 
             <div id="milestone-container" class="milestone-list"></div>
             <button id="add-event-btn" class="btn-add-event">+ Add Life Event (Milestone)</button>
         </div>
     </div>
-
-    <nav class="tools-nav">
-        <a href="index.html" class="nav-item" title="Static, Closed-form calculus or diff r_acc from r_dc">
-            1. Macro Sandbox
-            <span>High-level Engine</span>
-        </a>
-        <a href="#" class="nav-item active" title="Static, Year-by-year lookup">
-            2. Cash Flow Planner
-            <span>Variable Yearly Flow</span>
-        </a>
-        <a href="#" class="nav-item" title="Stochastic, Uniform inputs">
-            3. Volatility Simulator
-            <span>Stochastic Uniform</span>
-        </a>
-        <a href="#" class="nav-item" title="Stochastic, Non-uniform engine">
-            4. Stress Tester
-            <span>Lifepath Volatility</span>
-        </a>
-    </nav>
 </div>
 
 <script>
@@ -589,19 +506,12 @@
     const btnLockX = document.getElementById('btn-lock-x');
     const btnLockY = document.getElementById('btn-lock-y');
     
-    const ssList = document.getElementById('ss-list');
-    const windfallList = document.getElementById('windfall-list');
-    const btnAddSs = document.getElementById('btn-add-ss');
-    const btnAddWindfall = document.getElementById('btn-add-windfall');
-
     let chartInstance = null;
     let ratesLinked = false;
     let computedPeakCache = 0;
     
     // Internal data structure
     let milestones = [];
-    let ssEvents = [];
-    let windfallEvents = [];
 
     function initChart() {
         const ctx = document.getElementById('lifepathChart').getContext('2d');
@@ -704,43 +614,41 @@
         const k = Math.floor(rAge);
         const delta = rAge - k;
 
-        for (let t = startAge; t <= endAge; t++) {
+        for (let t = startAge; t < endAge; t++) {
             labels.push(t);
             nwData.push(balance);
             
             const m = getMilestone(t);
-            
-            let passive = ssEvents.reduce((acc, ss) => acc + (t >= ss.age ? ss.amt : 0), 0);
-            let windfall = windfallEvents.reduce((acc, wf) => {
-                if (t === wf.age) return acc + wf.amt;
-                return acc;
-            }, 0);
-
             if (t < k) {
                 // Full working year
-                inflowData.push(m.income + passive + windfall);
+                inflowData.push(m.income);
                 outflowData.push(-m.spending);
-                balance = balance * (1 + rAcc) + m.savings + passive + windfall;
-                peakNw = Math.max(peakNw, balance);
+                balance = balance * (1 + rAcc) + m.savings;
+                peakNw = balance;
             } else if (t === k) {
                 // Transition year (Fractional retirement)
                 const workFrac = delta;
                 const retireFrac = 1 - delta;
 
-                inflowData.push((m.income * workFrac) + passive + windfall);
+                inflowData.push(m.income * workFrac);
                 outflowData.push(-m.spending);
 
-                const balanceMid = balance * Math.pow(1 + rAcc, workFrac) + (m.savings * workFrac) + (passive * workFrac) + (windfall * workFrac);
-                balance = (balanceMid - m.spending * retireFrac + (passive * retireFrac) + (windfall * retireFrac)) * Math.pow(1 + rDec, retireFrac);
-                peakNw = Math.max(peakNw, balanceMid, balance);
+                const balanceMid = balance * Math.pow(1 + rAcc, workFrac) + (m.savings * workFrac);
+                balance = (balanceMid - m.spending * retireFrac) * Math.pow(1 + rDec, retireFrac);
+                peakNw = balanceMid;
             } else {
                 // Full retirement year
-                inflowData.push(passive + windfall);
+                inflowData.push(0);
                 outflowData.push(-m.spending);
-                balance = (balance - m.spending + passive + windfall) * (1 + rDec);
-                peakNw = Math.max(peakNw, balance);
+                balance = (balance - m.spending) * (1 + rDec);
             }
         }
+
+        // Final boundary point representing state at the start of the stop age
+        labels.push(endAge);
+        nwData.push(balance);
+        inflowData.push(0);
+        outflowData.push(0);
 
         return { labels, inflowData, outflowData, nwData, finalBalance: balance, peakNw };
     }
@@ -827,8 +735,6 @@
         params.set('growthDec', boxGrowthDec.value);
         params.set('legacyFloor', boxLegacyFloor.value);
         params.set('linked', ratesLinked);
-        params.set('ss', JSON.stringify(ssEvents.map(e => [e.amt, e.age])));
-        params.set('wf', JSON.stringify(windfallEvents.map(e => [e.amt, e.age])));
         if(boxAxisMin.value !== "") params.set('xMin', boxAxisMin.value);
         if(boxAxisMax.value !== "") params.set('xMax', boxAxisMax.value);
         if(boxYMax.value !== "") params.set('yMax', boxYMax.value);
@@ -852,14 +758,6 @@
         if (params.has('xMin')) boxAxisMin.value = params.get('xMin');
         if (params.has('xMax')) boxAxisMax.value = params.get('xMax');
         if (params.has('yMax')) boxYMax.value = params.get('yMax');
-        if (params.has('ss')) {
-            const data = JSON.parse(params.get('ss'));
-            ssEvents = data.map(d => ({ id: Math.random().toString(36).substr(2,9), amt: d[0], age: d[1] }));
-        }
-        if (params.has('wf')) {
-            const data = JSON.parse(params.get('wf'));
-            windfallEvents = data.map(d => ({ id: Math.random().toString(36).substr(2,9), amt: d[0], age: d[1] }));
-        }
         
         if (params.get('linked') === 'true') {
             ratesLinked = true;
@@ -868,7 +766,7 @@
             inputGrowthDec.disabled = boxGrowthDec.disabled = true;
         }
 
-        if (boxAxisMin.value !== "" || boxAxisMax.value !== "" || boxYMax.value !== "") {
+        if (boxAxisMin.value !== "" || boxYMax.value !== "") {
             mainLockBtn.textContent = "Unlock Auto-Scale";
             mainLockBtn.classList.add('locked');
         }
@@ -925,24 +823,6 @@
         updateSimulation();
     });
 
-    function updateButtonStates() {
-        if (boxAxisMin.value !== "" || boxAxisMax.value !== "") {
-            btnLockX.textContent = "Unlock Auto";
-            btnLockX.classList.add('locked');
-        } else {
-            btnLockX.textContent = "Lock Current";
-            btnLockX.classList.remove('locked');
-        }
-
-        if (boxYMax.value !== "") {
-            btnLockY.textContent = "Unlock Auto";
-            btnLockY.classList.add('locked');
-        } else {
-            btnLockY.textContent = "Lock Current";
-            btnLockY.classList.remove('locked');
-        }
-    }
-
     btnLockX.addEventListener('click', () => {
         if (boxAxisMin.value !== "" || boxAxisMax.value !== "") {
             boxAxisMin.value = "";
@@ -982,14 +862,10 @@
                 else snappedCeiling = Math.ceil(rawPeak / 10000) * 10000;
                 boxYMax.value = snappedCeiling;
             }
-            mainLockBtn.textContent = "Unlock Auto-Scale";
-            mainLockBtn.classList.add('locked');
         } else {
             boxAxisMin.value = "";
             boxAxisMax.value = "";
             boxYMax.value = "";
-            mainLockBtn.textContent = "Lock Scale for Comparison";
-            mainLockBtn.classList.remove('locked');
         }
         updateSimulation();
     });
@@ -1038,19 +914,19 @@
         
         inpIncome.addEventListener('input', () => {
             // Adjust savings when income moves
-            inpSavings.value = Math.max(0, inpIncome.value - inpSpending.value);
+            inpSavings.value = inpIncome.value - inpSpending.value;
             syncDataAndSort();
         });
 
         inpSpending.addEventListener('input', () => {
             // Adjust savings when spending moves
-            inpSavings.value = Math.max(0, inpIncome.value - inpSpending.value);
+            inpSavings.value = inpIncome.value - inpSpending.value;
             syncDataAndSort();
         });
 
         inpSavings.addEventListener('input', () => {
             // Keeping Income fixed and letting Spending absorb the change per fallback logic
-            inpSpending.value = Math.max(0, inpIncome.value - inpSavings.value);
+            inpSpending.value = inpIncome.value - inpSavings.value;
             syncDataAndSort();
         });
 
@@ -1159,51 +1035,6 @@
     boxAxisMax.addEventListener('change', updateSimulation);
     boxYMax.addEventListener('change', updateSimulation);
 
-    function renderDynamicEvents() {
-        ssList.innerHTML = '';
-        ssEvents.forEach(e => ssList.appendChild(createEventUI(e, 'ss')));
-        windfallList.innerHTML = '';
-        windfallEvents.forEach(e => windfallList.appendChild(createEventUI(e, 'wf')));
-    }
-
-    function createEventUI(event, type) {
-        const row = document.createElement('div');
-        row.className = 'interactive-row';
-        row.style.marginBottom = '4px';
-        row.innerHTML = `
-            <input type="number" class="manual-box inp-amt" style="flex: 1;" value="${event.amt}" placeholder="Amount ($)">
-            <input type="number" class="manual-box inp-age" style="width: 60px;" value="${event.age}" placeholder="Age">
-            <button class="btn-delete" style="opacity:0.6; padding:0 4px;">✕</button>
-        `;
-        const inpAmt = row.querySelector('.inp-amt');
-        const inpAge = row.querySelector('.inp-age');
-        const btnDel = row.querySelector('.btn-delete');
-
-        inpAmt.addEventListener('change', () => { event.amt = parseFloat(inpAmt.value) || 0; updateSimulation(); });
-        inpAge.addEventListener('change', () => { event.age = parseInt(inpAge.value) || 0; updateSimulation(); });
-        btnDel.addEventListener('click', () => {
-            if (type === 'ss') ssEvents = ssEvents.filter(x => x.id !== event.id);
-            else windfallEvents = windfallEvents.filter(x => x.id !== event.id);
-            renderDynamicEvents();
-            updateSimulation();
-        });
-        return row;
-    }
-
-    btnAddSs.addEventListener('click', () => {
-        if (ssEvents.length >= 100) return;
-        ssEvents.push({ id: Math.random().toString(36).substr(2,9), amt: 10000, age: 67 });
-        renderDynamicEvents();
-        updateSimulation();
-    });
-
-    btnAddWindfall.addEventListener('click', () => {
-        if (windfallEvents.length >= 100) return;
-        windfallEvents.push({ id: Math.random().toString(36).substr(2,9), amt: 50000, age: 50 });
-        renderDynamicEvents();
-        updateSimulation();
-    });
-
     // Initialize
     loadParamsFromURL();
     if (milestones.length === 0) {
@@ -1211,7 +1042,6 @@
     } else {
         renderMilestones();
     }
-    renderDynamicEvents();
 </script>
 </body>
 </html>
