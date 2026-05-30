@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Money Plot Labs - Lifepath Cash Flow Simulator</title>
+    <title>Money Plot Labs - Retirement Stress Testzer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
         :root {
@@ -78,6 +78,10 @@
 
         .metric-card.blue .metric-value {
             color: var(--accent-blue);
+        }
+
+        .metric-card.green .metric-value {
+            color: var(--accent-green);
         }
 
         .layout-split {
@@ -173,6 +177,18 @@
             font-size: 0.9rem;
             font-weight: 500;
             color: var(--text-main);
+        }
+
+        select {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         /* Standardized Input Styling for consistency */
@@ -403,7 +419,7 @@
 <body>
 
 <div class="container">
-    <h2>Money Plot Labs: Lifepath Cash Flow Simulator</h2>
+    <h2>Money Plot Labs: Retirement Stress Tester</h2>
 
     <div class="metrics-grid">
         <div class="metric-card">
@@ -415,8 +431,8 @@
             <div id="metric-retire-age" class="metric-value">Age --</div>
         </div>
         <div class="metric-card">
-            <div class="metric-label">Peak Nest Egg Needed</div>
-            <div id="metric-peak-nw" class="metric-value">$0</div>
+            <div class="metric-label">Success Rate</div>
+            <div id="metric-success-rate" class="metric-value">0%</div>
         </div>
     </div>
 
@@ -455,6 +471,14 @@
             </div>
 
             <div class="control-group">
+                <label class="control-label">Retirement Age</label>
+                <div class="interactive-row">
+                    <input type="range" id="slider-retire-age" min="0" max="100" value="65">
+                    <input type="number" id="box-retire-age" class="manual-box" min="0" max="100" value="65">
+                </div>
+            </div>
+
+            <div class="control-group">
                 <label class="control-label" id="label-principal">Starting Balance: $0</label>
                 <div class="interactive-row">
                     <input type="range" id="input-principal" min="0" max="1000000" step="10000" value="0">
@@ -463,10 +487,21 @@
             </div>
 
             <div class="control-group">
-                <label class="control-label" id="label-growth">Real Growth Rate during accumulation: 3.0%</label>
-                <div class="interactive-row">
-                    <input type="range" id="input-growth" min="-3.0" max="7.0" step="0.5" value="3.0">
-                    <input type="number" id="box-growth" class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
+                <label class="control-label">Accumulation Growth Method</label>
+                <select id="select-growth-method-acc">
+                    <option value="60-40" selected>60/40 US-Stocks/US-Bonds</option>
+                    <option value="equities">US Equities</option>
+                    <option value="manual">Mean & Standard Deviation</option>
+                </select>
+                <div id="manual-inputs-acc" style="display: none; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+                    <div class="control-group">
+                        <label class="control-label" style="font-size: 0.75rem;">Mean %</label>
+                        <input type="number" id="box-growth-mean-acc" value="5.0" step="0.1">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" style="font-size: 0.75rem;">Std Dev %</label>
+                        <input type="number" id="box-growth-std-acc" value="10.0" step="0.1">
+                    </div>
                 </div>
             </div>
 
@@ -478,12 +513,23 @@
             <div class="advanced-content" id="advanced-panel">
                 <div class="control-group">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label class="control-label" id="label-growth-dec">Real Growth Rate (Decumulation): 3.0%</label>
+                        <label class="control-label">Decumulation Growth Method</label>
                         <button class="btn-lock" id="btn-link-rates" style="width: auto; height: 24px; padding: 0 8px; font-size: 0.75rem;">Link to Accumulation</button>
                     </div>
-                    <div class="interactive-row">
-                        <input type="range" id="input-growth-dec" min="-3.0" max="7.0" step="0.5" value="3.0">
-                        <input type="number" id="box-growth-dec" class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
+                    <select id="select-growth-method-dec">
+                        <option value="60-40" selected>60/40 US-Stocks/US-Bonds</option>
+                        <option value="equities">US Equities</option>
+                        <option value="manual">Mean & Standard Deviation</option>
+                    </select>
+                    <div id="manual-inputs-dec" style="display: none; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+                        <div class="control-group">
+                            <label class="control-label" style="font-size: 0.75rem;">Mean %</label>
+                            <input type="number" id="box-growth-mean-dec" value="5.0" step="0.1">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" style="font-size: 0.75rem;">Std Dev %</label>
+                            <input type="number" id="box-growth-std-dec" value="10.0" step="0.1">
+                        </div>
                     </div>
                 </div>
 
@@ -543,7 +589,7 @@
             1. Macro Sandbox
             <span>High-level Engine</span>
         </a>
-        <a href="#" class="nav-item active" title="Static, Year-by-year lookup">
+        <a href="LifepathCashFlowSimulator.html" class="nav-item" title="Static, Year-by-year lookup">
             2. Cash Flow Planner
             <span>Variable Yearly Flow</span>
         </a>
@@ -551,7 +597,7 @@
             3. Volatility Simulator
             <span>Stochastic Uniform</span>
         </a>
-        <a href="#" class="nav-item" title="Stochastic, Non-uniform engine">
+        <a href="#" class="nav-item active" title="Stochastic, Non-uniform engine">
             4. Stress Tester
             <span>Lifepath Volatility</span>
         </a>
@@ -565,18 +611,28 @@
 
     const sliderStartAge = document.getElementById('slider-start-age');
     const boxStartAge = document.getElementById('box-start-age');
+    const sliderRetireAge = document.getElementById('slider-retire-age');
+    const boxRetireAge = document.getElementById('box-retire-age');
+
     const mWorkYears = document.getElementById('metric-work-years');
     const mRetireAge = document.getElementById('metric-retire-age');
-    const mPeakNw = document.getElementById('metric-peak-nw');
+    const mSuccessRate = document.getElementById('metric-success-rate');
 
     const sliderEndAge = document.getElementById('slider-end-age');
     const boxEndAge = document.getElementById('box-end-age');
     const inputPrincipal = document.getElementById('input-principal');
     const boxPrincipal = document.getElementById('box-principal');
-    const inputGrowth = document.getElementById('input-growth');
-    const boxGrowth = document.getElementById('box-growth');
-    const inputGrowthDec = document.getElementById('input-growth-dec');
-    const boxGrowthDec = document.getElementById('box-growth-dec');
+
+    const selectGrowthMethodAcc = document.getElementById('select-growth-method-acc');
+    const manualInputsAcc = document.getElementById('manual-inputs-acc');
+    const boxGrowthMeanAcc = document.getElementById('box-growth-mean-acc');
+    const boxGrowthStdAcc = document.getElementById('box-growth-std-acc');
+
+    const selectGrowthMethodDec = document.getElementById('select-growth-method-dec');
+    const manualInputsDec = document.getElementById('manual-inputs-dec');
+    const boxGrowthMeanDec = document.getElementById('box-growth-mean-dec');
+    const boxGrowthStdDec = document.getElementById('box-growth-std-dec');
+
     const btnLinkRates = document.getElementById('btn-link-rates');
     const btnAdvanced = document.getElementById('advanced-button');
     const panelAdvanced = document.getElementById('advanced-panel');
@@ -597,6 +653,9 @@
     let chartInstance = null;
     let ratesLinked = false;
     let computedPeakCache = 0;
+
+    const histEquities = [36.3, -43.8, -25.1, -8.3, 49.0, -1.2, 40.9, 32.2, -32.0, 26.6, -1.0, 28.5, -12.4, -13.0, 18.0, 31.0, -11.0, 31.0, 5.0, -9.0, 48.0, 15.0, 26.0, 12.0, 15.0, -1.0, 47.0, 27.0, 4.0, 11.0, -12.0, 39.0, -1.0, 23.0, -11.0, 19.0, 13.0, 10.0, -13.0, 20.0, 9.0, -11.0, 0.0, 12.0, 15.0, -17.0, -29.0, 31.0, 19.0, -10.0, 5.0, 15.0, 27.0, -7.0, 17.0, 19.0, 4.0, 27.0, 15.0, 3.0, 13.0, 27.0, -6.0, 27.0, 6.0, 7.0, 1.0, 34.0, 20.0, 30.0, 26.0, 19.0, -10.0, -13.0, -23.0, 26.0, 9.0, 3.0, 13.0, 3.0, -38.0, 23.0, 13.0, 0.0, 13.0, 30.0, 11.0, -1.0, 9.0, 19.0, -6.0, 29.0, 15.0, 24.0, -19.0, 24.0];
+    const hist6040 = [14.0, -18.0, -11.0, -1.0, 20.0, 2.0, 18.0, 15.0, -14.0, 12.0, 3.0, 14.0, -4.0, -4.0, 9.0, 14.0, -3.0, 14.0, 4.0, -1.0, 22.0, 9.0, 13.0, 8.0, 9.0, 2.0, 21.0, 12.0, 5.0, 8.0, -3.0, 17.0, 3.0, 11.0, -2.0, 10.0, 8.0, 7.0, -4.0, 10.0, 6.0, -2.0, 4.0, 9.0, 10.0, -6.0, -11.0, 16.0, 12.0, -2.0, 5.0, 9.0, 14.0, 1.0, 12.0, 14.0, 7.0, 17.0, 12.0, 5.0, 9.0, 15.0, 1.0, 16.0, 6.0, 6.0, 3.0, 20.0, 13.0, 18.0, 17.0, 13.0, -2.0, -4.0, -9.0, 16.0, 8.0, 5.0, 10.0, 6.0, -19.0, 15.0, 10.0, 3.0, 10.0, 18.0, 9.0, 1.0, 6.0, 12.0, -1.0, 18.0, 11.0, 15.0, -16.0, 14.0];
     
     // Internal data structure
     let milestones = [];
@@ -700,11 +759,38 @@
         loader.style.display = 'none';
     }
 
+    function getReturnSeries(method, mean, std, count) {
+        if (method === 'manual') {
+            return Array.from({length: count}, () => {
+                const u1 = Math.random();
+                const u2 = Math.random();
+                const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                return (mean / 100) + (z * (std / 100));
+            });
+        } else if (method === 'equities') {
+            return Array.from({length: count}, () => histEquities[Math.floor(Math.random() * histEquities.length)] / 100);
+        } else {
+            return Array.from({length: count}, () => hist6040[Math.floor(Math.random() * hist6040.length)] / 100);
+        }
+    }
+
+    function toggleManualInputs() {
+        manualInputsAcc.style.display = selectGrowthMethodAcc.value === 'manual' ? 'grid' : 'none';
+        if (!ratesLinked) {
+            manualInputsDec.style.display = selectGrowthMethodDec.value === 'manual' ? 'grid' : 'none';
+        } else {
+            manualInputsDec.style.display = manualInputsAcc.style.display;
+        }
+    }
+
+    selectGrowthMethodAcc.addEventListener('change', () => { if(ratesLinked) selectGrowthMethodDec.value = selectGrowthMethodAcc.value; toggleManualInputs(); updateSimulation(); });
+    selectGrowthMethodDec.addEventListener('change', () => { toggleManualInputs(); updateSimulation(); });
+
     function getMilestone(age) {
         return milestones.filter(m => m.age <= age).pop() || milestones[0];
     }
 
-    function simulateLife(startAge, endAge, principal, rAcc, rDec, rAge, planningEndAge) {
+    function simulateLife(startAge, endAge, principal, rAge, planningEndAge, returnsAcc, returnsDec) {
         const labels = [];
         const inflowData = [];
         const growthData = [];
@@ -744,12 +830,14 @@
             }, 0);
 
             let growth = 0;
+            const r_acc = returnsAcc[t - startAge];
+            const r_dec = returnsDec[t - startAge];
 
             if (t < k) {
                 // Full working year
                 inflowData.push({ x: t, y: m.income + passive + windfall });
                 outflowData.push({ x: t, y: -m.spending });
-                balance = balance * (1 + rAcc) + m.savings + passive + windfall;
+                balance = balance * (1 + r_acc) + m.savings + passive + windfall;
                 growth = balance - startBal - m.savings - passive - windfall;
                 peakNw = Math.max(peakNw, balance);
             } else if (t === k) {
@@ -760,21 +848,21 @@
                 inflowData.push({ x: t, y: (m.income * workFrac) + passive + windfall });
                 outflowData.push({ x: t, y: -m.spending });
 
-                const balanceMid = balance * Math.pow(1 + rAcc, workFrac) + (m.savings * workFrac) + (passive * workFrac) + (windfall * workFrac);
+                const balanceMid = balance * Math.pow(1 + r_acc, workFrac) + (m.savings * workFrac) + (passive * workFrac) + (windfall * workFrac);
                 
                 // Insert intermediate peak point for the line chart
                 if (delta > 0 && t <= planningEndAge) {
                     nwData.push({ x: t + delta, y: balanceMid });
                 }
 
-                balance = (balanceMid - m.spending * retireFrac + (passive * retireFrac) + (windfall * retireFrac)) * Math.pow(1 + rDec, retireFrac);
+                balance = (balanceMid - m.spending * retireFrac + (passive * retireFrac) + (windfall * retireFrac)) * Math.pow(1 + r_dec, retireFrac);
                 growth = balance - startBal - (m.savings * workFrac) + (m.spending * retireFrac) - passive - windfall;
                 peakNw = Math.max(peakNw, balanceMid, balance);
             } else {
                 // Full retirement year
                 inflowData.push({ x: t, y: passive + windfall });
                 outflowData.push({ x: t, y: -m.spending });
-                balance = (balance - m.spending + passive + windfall) * (1 + rDec);
+                balance = (balance - m.spending + passive + windfall) * (1 + r_dec);
                 growth = balance - startBal + m.spending - passive - windfall;
                 peakNw = Math.max(peakNw, balance);
             }
@@ -790,50 +878,49 @@
 
         const currentAge = parseInt(boxStartAge.value);
         const stopAge = parseInt(boxEndAge.value);
+        const rAge = parseFloat(boxRetireAge.value);
         const principal = parseFloat(boxPrincipal.value) || 0;
-        const rAcc = (parseFloat(boxGrowth.value) || 0) / 100;
-        const rDec = (parseFloat(boxGrowthDec.value) || 0) / 100;
         const floor = parseFloat(boxLegacyFloor.value) || 0;
 
-        // Numerical Solver (Bisection)
-        let w = 0;
-        // Allow working through the final year by extending horizon to start of age stopAge + 1
-        const horizon = stopAge - currentAge + 1;
-        const resAtH = simulateLife(currentAge, stopAge, principal, rAcc, rDec, currentAge + horizon, stopAge);
-        const resAtStart = simulateLife(currentAge, stopAge, principal, rAcc, rDec, currentAge, stopAge);
+        const methodAcc = selectGrowthMethodAcc.value;
+        const meanAcc = parseFloat(boxGrowthMeanAcc.value) || 0;
+        const stdAcc = parseFloat(boxGrowthStdAcc.value) || 0;
 
-        if (resAtStart.finalBalance >= floor) {
-            w = 0;
-        } else if (resAtH.finalBalance < floor) {
-            w = horizon;
-        } else {
-            let low = currentAge, high = currentAge + horizon;
-            for (let i = 0; i < 60; i++) {
-                let mid = (low + high) / 2;
-                let test = simulateLife(currentAge, stopAge, principal, rAcc, rDec, mid, stopAge);
-                if (test.finalBalance < floor) low = mid;
-                else high = mid;
+        const methodDec = selectGrowthMethodDec.value;
+        const meanDec = parseFloat(boxGrowthMeanDec.value) || 0;
+        const stdDec = parseFloat(boxGrowthStdDec.value) || 0;
+
+        const horizon = Math.max(stopAge, 120) - currentAge + 1;
+
+        // Monte Carlo Simulation
+        const iterations = 500;
+        let successes = 0;
+        let firstPath = null;
+
+        for (let i = 0; i < iterations; i++) {
+            const retAcc = getReturnSeries(methodAcc, meanAcc, stdAcc, horizon);
+            const retDec = getReturnSeries(methodDec, meanDec, stdDec, horizon);
+            
+            const sim = simulateLife(currentAge, stopAge, principal, rAge, stopAge, retAcc, retDec);
+            if (sim.finalBalance >= floor) successes++;
+            if (i === 0) {
+                firstPath = sim;
+                computedPeakCache = sim.peakNw;
             }
-            w = ((low + high) / 2) - currentAge;
         }
 
-        const rAge = currentAge + w;
-        const finalSim = simulateLife(currentAge, stopAge, principal, rAcc, rDec, rAge, stopAge);
-        computedPeakCache = finalSim.peakNw;
+        const successRate = (successes / iterations) * 100;
+        mSuccessRate.innerText = successRate.toFixed(1) + '%';
+        mSuccessRate.parentElement.className = 'metric-card ' + (successRate > 80 ? 'green' : successRate > 50 ? 'blue' : '');
+
+        const w = Math.max(0, rAge - currentAge);
 
         // Update Metrics
         mWorkYears.innerText = w.toFixed(1) + ' Years';
-        if (w >= (stopAge - currentAge) && resAtH.finalBalance < floor) {
-            mRetireAge.innerText = 'Never';
-        } else {
-            mRetireAge.innerText = 'Age ' + rAge.toFixed(1);
-        }
-        mPeakNw.innerText = formatCurrency(finalSim.peakNw);
+        mRetireAge.innerText = 'Age ' + rAge.toFixed(1);
 
         // Labels updates for context
         document.getElementById('label-principal').innerText = 'Starting Balance: ' + formatCurrency(principal);
-        document.getElementById('label-growth').innerText = 'Real Growth Rate during accumulation: ' + (rAcc * 100).toFixed(1) + '%';
-        document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + (rDec * 100).toFixed(1) + '%';
         document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(floor);
 
         // View Clamping
@@ -841,7 +928,8 @@
         let axisMax = boxAxisMax.value !== "" ? parseInt(boxAxisMax.value) : stopAge + 1;
         let yMaxConstraint = boxYMax.value !== "" ? parseFloat(boxYMax.value) : undefined;
 
-        const viewSim = simulateLife(currentAge, Math.max(stopAge, axisMax), principal, rAcc, rDec, rAge, stopAge);
+        // For visual chart, use the first generated path
+        const viewSim = firstPath;
 
         chartInstance.data.labels = viewSim.labels;
         chartInstance.data.datasets[0].data = viewSim.inflowData;
@@ -849,6 +937,7 @@
         chartInstance.data.datasets[2].data = viewSim.growthData;
         chartInstance.data.datasets[3].data = viewSim.nwData;
 
+        chartInstance.options.scales.x.type = 'linear';
         chartInstance.options.scales.x.min = axisMin;
         chartInstance.options.scales.x.max = axisMax;
         chartInstance.options.scales.yNetWorth.max = yMaxConstraint;
@@ -863,8 +952,6 @@
         params.set('startAge', boxStartAge.value);
         params.set('endAge', boxEndAge.value);
         params.set('principal', boxPrincipal.value);
-        params.set('growth', boxGrowth.value);
-        params.set('growthDec', boxGrowthDec.value);
         params.set('legacyFloor', boxLegacyFloor.value);
         params.set('linked', ratesLinked);
         params.set('ss', JSON.stringify(ssEvents.map(e => [e.amt, e.age])));
@@ -886,8 +973,6 @@
         if (params.has('startAge')) boxStartAge.value = sliderStartAge.value = params.get('startAge');
         if (params.has('endAge')) boxEndAge.value = sliderEndAge.value = params.get('endAge');
         if (params.has('principal')) boxPrincipal.value = inputPrincipal.value = params.get('principal');
-        if (params.has('growth')) boxGrowth.value = inputGrowth.value = params.get('growth');
-        if (params.has('growthDec')) boxGrowthDec.value = inputGrowthDec.value = params.get('growthDec');
         if (params.has('legacyFloor')) boxLegacyFloor.value = sliderLegacyFloor.value = params.get('legacyFloor');
         if (params.has('xMin')) boxAxisMin.value = params.get('xMin');
         if (params.has('xMax')) boxAxisMax.value = params.get('xMax');
@@ -905,7 +990,9 @@
             ratesLinked = true;
             btnLinkRates.textContent = "Rates Linked";
             btnLinkRates.classList.add('locked');
-            inputGrowthDec.disabled = boxGrowthDec.disabled = true;
+            selectGrowthMethodDec.disabled = true;
+            boxGrowthMeanDec.disabled = boxGrowthStdDec.disabled = true;
+            toggleManualInputs();
         }
 
         if (boxAxisMin.value !== "" || boxAxisMax.value !== "" || boxYMax.value !== "") {
@@ -952,16 +1039,16 @@
             btnLinkRates.textContent = "Rates Linked";
             btnLinkRates.classList.add('locked');
             
-            boxGrowthDec.value = boxGrowth.value;
-            inputGrowthDec.value = inputGrowth.value;
-            inputGrowthDec.disabled = true;
-            boxGrowthDec.disabled = true;
+            selectGrowthMethodDec.value = selectGrowthMethodAcc.value;
+            boxGrowthMeanDec.value = boxGrowthMeanAcc.value;
+            boxGrowthStdDec.value = boxGrowthStdAcc.value;
+            selectGrowthMethodDec.disabled = boxGrowthMeanDec.disabled = boxGrowthStdDec.disabled = true;
         } else {
             btnLinkRates.textContent = "Link to Accumulation";
             btnLinkRates.classList.remove('locked');
-            inputGrowthDec.disabled = false;
-            boxGrowthDec.disabled = false;
+            selectGrowthMethodDec.disabled = boxGrowthMeanDec.disabled = boxGrowthStdDec.disabled = false;
         }
+        toggleManualInputs();
         updateSimulation();
     });
 
@@ -1172,27 +1259,20 @@
 
     linkInputs(sliderStartAge, boxStartAge);
     linkInputs(sliderEndAge, boxEndAge);
+    linkInputs(sliderRetireAge, boxRetireAge);
     linkInputs(inputPrincipal, boxPrincipal, (val) => {
         document.getElementById('label-principal').innerText = 'Starting Balance: ' + formatCurrency(val);
-    });
-    linkInputs(inputGrowth, boxGrowth, (val) => {
-        document.getElementById('label-growth').innerText = 'Real Growth Rate during accumulation: ' + parseFloat(val).toFixed(1) + '%';
-        if (ratesLinked) {
-            inputGrowthDec.value = boxGrowthDec.value = val;
-            document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + parseFloat(val).toFixed(1) + '%';
-        }
-    });
-    linkInputs(inputGrowthDec, boxGrowthDec, (val) => {
-        document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + parseFloat(val).toFixed(1) + '%';
     });
     linkInputs(sliderLegacyFloor, boxLegacyFloor, (val) => {
         document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(val);
     });
+    boxGrowthMeanAcc.addEventListener('input', () => { if(ratesLinked) boxGrowthMeanDec.value = boxGrowthMeanAcc.value; updateSimulation(); });
+    boxGrowthStdAcc.addEventListener('input', () => { if(ratesLinked) boxGrowthStdDec.value = boxGrowthStdAcc.value; updateSimulation(); });
+    boxGrowthMeanDec.addEventListener('input', updateSimulation);
+    boxGrowthStdDec.addEventListener('input', updateSimulation);
 
     // Set initial labels
     document.getElementById('label-principal').innerText = 'Starting Balance: ' + formatCurrency(boxPrincipal.value);
-    document.getElementById('label-growth').innerText = 'Real Growth Rate during accumulation: ' + parseFloat(boxGrowth.value).toFixed(1) + '%';
-    document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + parseFloat(boxGrowthDec.value).toFixed(1) + '%';
     document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(boxLegacyFloor.value);
 
     boxAxisMin.addEventListener('change', updateSimulation);
