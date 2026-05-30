@@ -619,6 +619,14 @@
                         stack: 'flow'
                     },
                     {
+                        label: 'Asset Growth',
+                        data: [],
+                        backgroundColor: 'rgba(139, 92, 246, 0.6)',
+                        borderColor: '#8B5CF6',
+                        borderWidth: 1,
+                        stack: 'flow'
+                    },
+                    {
                         label: 'Outflow (Spending)',
                         data: [],
                         backgroundColor: 'rgba(239, 68, 68, 0.6)',
@@ -651,7 +659,7 @@
                         title: { display: true, text: 'Age', color: '#94a3b8' }
                     },
                     y: {
-                        stacked: false,
+                        stacked: true,
                         grid: { color: '#334155' },
                         beginAtZero: true,
                         ticks: { 
@@ -695,6 +703,7 @@
     function simulateLife(startAge, endAge, principal, rAcc, rDec, rAge) {
         const labels = [];
         const inflowData = [];
+        const growthData = [];
         const outflowData = [];
         const nwData = [];
         
@@ -708,6 +717,7 @@
             labels.push(t);
             nwData.push(balance);
             
+            const startBal = balance;
             const m = getMilestone(t);
             
             let passive = ssEvents.reduce((acc, ss) => acc + (t >= ss.age ? ss.amt : 0), 0);
@@ -716,11 +726,14 @@
                 return acc;
             }, 0);
 
+            let growth = 0;
+
             if (t < k) {
                 // Full working year
                 inflowData.push(m.income + passive + windfall);
                 outflowData.push(-m.spending);
                 balance = balance * (1 + rAcc) + m.savings + passive + windfall;
+                growth = balance - startBal - m.savings;
                 peakNw = Math.max(peakNw, balance);
             } else if (t === k) {
                 // Transition year (Fractional retirement)
@@ -732,17 +745,26 @@
 
                 const balanceMid = balance * Math.pow(1 + rAcc, workFrac) + (m.savings * workFrac) + (passive * workFrac) + (windfall * workFrac);
                 balance = (balanceMid - m.spending * retireFrac + (passive * retireFrac) + (windfall * retireFrac)) * Math.pow(1 + rDec, retireFrac);
+                growth = balance - startBal - (m.savings * workFrac) + (m.spending * retireFrac);
                 peakNw = Math.max(peakNw, balanceMid, balance);
             } else {
                 // Full retirement year
                 inflowData.push(passive + windfall);
                 outflowData.push(-m.spending);
                 balance = (balance - m.spending + passive + windfall) * (1 + rDec);
-                peakNw = Math.max(peakNw, balance);
+                growth = balance - startBal + m.spending - passive - windfall;
             }
+            growthData.push(growth);
         }
 
-        return { labels, inflowData, outflowData, nwData, finalBalance: balance, peakNw };
+        // Final boundary point representing state at the start of the stop age
+        labels.push(endAge);
+        nwData.push(balance);
+        inflowData.push(0);
+        growthData.push(0);
+        outflowData.push(0);
+
+        return { labels, inflowData, growthData, outflowData, nwData, finalBalance: balance, peakNw };
     }
 
     function updateSimulation() {
@@ -806,8 +828,9 @@
 
         chartInstance.data.labels = viewSim.labels;
         chartInstance.data.datasets[0].data = viewSim.inflowData;
-        chartInstance.data.datasets[1].data = viewSim.outflowData;
-        chartInstance.data.datasets[2].data = viewSim.nwData;
+        chartInstance.data.datasets[1].data = viewSim.growthData;
+        chartInstance.data.datasets[2].data = viewSim.outflowData;
+        chartInstance.data.datasets[3].data = viewSim.nwData;
 
         chartInstance.options.scales.x.min = axisMin;
         chartInstance.options.scales.x.max = axisMax;
