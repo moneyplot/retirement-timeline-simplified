@@ -831,6 +831,14 @@
                     peak = Math.max(peak, bal);
                 }
             }
+
+            // Capture the terminal state at the very end of the planning horizon (start of year stopAge + 1)
+            const terminalAge = currentAge + totalHorizon + 1;
+            if (totalHorizon >= testW) {
+                depData.push({ x: terminalAge, y: Math.max(floor, bal) });
+            } else {
+                accData.push({ x: terminalAge, y: bal });
+            }
             return { finalBal: bal, peak, accData, depData };
         };
 
@@ -869,7 +877,7 @@
         let stopAge = parseInt(boxEndAge.value) || 95;
         
         let axisMin = boxAxisMin.value !== "" ? parseInt(boxAxisMin.value) : currentAge;
-        let axisMax = boxAxisMax.value !== "" ? parseInt(boxAxisMax.value) : stopAge;
+        let axisMax = boxAxisMax.value !== "" ? parseInt(boxAxisMax.value) : stopAge + 1;
 
         if (isNaN(axisMin)) axisMin = currentAge;
         if (isNaN(axisMax)) axisMax = stopAge;
