@@ -1,14 +1,20 @@
+/* ============================================================
+   CSS Custom Properties
+   ============================================================ */
 :root {
-    --bg-color: #0f172a;
-    --card-bg: #1e293b;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --accent-green: #10b981;
-    --accent-blue: #3b82f6;
-    --accent-red: #ef4444;
-    --border: #334155;
+    --bg-color:      #0f172a;
+    --card-bg:       #1e293b;
+    --text-main:     #f8fafc;
+    --text-muted:    #94a3b8;
+    --accent-green:  #10b981;
+    --accent-blue:   #3b82f6;
+    --accent-red:    #ef4444;
+    --border:        #334155;
 }
 
+/* ============================================================
+   Base
+   ============================================================ */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--bg-color);
@@ -38,6 +44,9 @@ h2 {
     color: var(--text-main);
 }
 
+/* ============================================================
+   Metrics Grid
+   ============================================================ */
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -68,14 +77,12 @@ h2 {
     color: var(--accent-green);
 }
 
-.metric-card.blue .metric-value {
-    color: var(--accent-blue);
-}
+.metric-card.blue  .metric-value { color: var(--accent-blue); }
+.metric-card.green .metric-value { color: var(--accent-green); }
 
-.metric-card.green .metric-value {
-    color: var(--accent-green);
-}
-
+/* ============================================================
+   Layout
+   ============================================================ */
 .layout-split {
     display: grid;
     grid-template-columns: 1fr;
@@ -89,6 +96,24 @@ h2 {
     }
 }
 
+/* ============================================================
+   Chart
+   ============================================================ */
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.chart-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 .chart-container {
     position: relative;
     height: 430px;
@@ -100,6 +125,17 @@ h2 {
     border: 1px solid var(--border);
 }
 
+.chart-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+/* ============================================================
+   Controls Panel
+   ============================================================ */
 .controls {
     display: flex;
     flex-direction: column;
@@ -124,8 +160,17 @@ h2 {
     color: var(--text-main);
 }
 
-/* Standardized Input Styling */
-input[type="number"], select {
+.control-label-sm {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+/* ============================================================
+   Inputs
+   ============================================================ */
+input[type="number"],
+select {
     background-color: var(--bg-color);
     border: 1px solid var(--border);
     color: var(--text-main);
@@ -137,7 +182,8 @@ input[type="number"], select {
     box-sizing: border-box;
 }
 
-input[type="number"]:focus, select:focus {
+input[type="number"]:focus,
+select:focus {
     border-color: var(--accent-blue);
 }
 
@@ -171,17 +217,17 @@ input[type="range"]::-webkit-slider-thumb:hover {
     gap: 12px;
 }
 
-.interactive-row input[type="range"] {
-    flex: 1;
-}
+.interactive-row input[type="range"] { flex: 1; }
 
-.interactive-row .manual-box {
+.manual-box {
     width: 110px;
     flex-shrink: 0;
     text-align: left;
 }
 
-/* Advanced Panel & Layout Components */
+/* ============================================================
+   Advanced Panel
+   ============================================================ */
 .advanced-toggle {
     display: flex;
     align-items: center;
@@ -198,9 +244,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     margin-top: 8px;
 }
 
-.advanced-toggle:hover {
-    background: rgba(51, 65, 85, 0.5);
-}
+.advanced-toggle:hover { background: rgba(51, 65, 85, 0.5); }
 
 .advanced-toggle .chevron {
     transition: transform 0.2s ease;
@@ -213,9 +257,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     stroke-linejoin: round;
 }
 
-.advanced-toggle.open .chevron {
-    transform: rotate(180deg);
-}
+.advanced-toggle.open .chevron { transform: rotate(180deg); }
 
 .advanced-content {
     display: none;
@@ -227,11 +269,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
     background: rgba(15, 23, 42, 0.2);
 }
 
-.advanced-content.visible {
-    display: flex;
-}
+.advanced-content.visible { display: flex; }
 
-.advanced-row-x, .advanced-row-y {
+.advanced-row-x,
+.advanced-row-y {
     display: flex;
     align-items: flex-end;
     gap: 12px;
@@ -245,11 +286,33 @@ input[type="range"]::-webkit-slider-thumb:hover {
     flex: 1;
 }
 
-.y-input-wrap {
-    flex: 1;
+.y-input-wrap { flex: 1; }
+
+/* ============================================================
+   Section Dividers (inside advanced panel)
+   ============================================================ */
+.section-divider {
+    margin-top: 12px;
+    border-top: 1px dashed var(--border);
+    padding-top: 12px;
 }
 
-/* Buttons */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.event-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
 .btn-lock {
     background-color: var(--accent-blue);
     color: var(--text-main);
@@ -265,14 +328,32 @@ input[type="range"]::-webkit-slider-thumb:hover {
     text-align: center;
 }
 
-.btn-lock:hover {
-    background-color: #2563eb;
-}
+.btn-lock:hover { background-color: #2563eb; }
 
 .btn-lock.locked {
     background-color: var(--accent-red);
     color: #fff;
     border: 1px solid var(--accent-red);
+}
+
+/* Size variants */
+.btn-lock-sm {
+    width: auto;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 0.75rem;
+}
+
+.btn-lock-chart {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 0.8rem;
+    width: auto;
+}
+
+.btn-lock-full {
+    width: 100%;
+    margin-top: 4px;
 }
 
 .btn-delete {
@@ -300,7 +381,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
     margin-top: 8px;
 }
 
-/* Milestones */
+/* ============================================================
+   Milestones
+   ============================================================ */
 .milestone-list {
     display: flex;
     flex-direction: column;
@@ -316,9 +399,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     transition: border-color 0.2s;
 }
 
-.milestone-block:hover {
-    border-color: var(--accent-blue);
-}
+.milestone-block:hover { border-color: var(--accent-blue); }
 
 .milestone-header {
     display: flex;
@@ -342,6 +423,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
     margin-bottom: 8px;
 }
 
+/* ============================================================
+   Placeholder
+   ============================================================ */
 .placeholder-text {
     color: var(--text-muted);
     font-size: 0.85rem;
@@ -352,7 +436,19 @@ input[type="range"]::-webkit-slider-thumb:hover {
     border-radius: 6px;
 }
 
-/* Navigation */
+/* ============================================================
+   Manual-input sub-grid (stress tester growth method)
+   ============================================================ */
+.manual-inputs-grid {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* ============================================================
+   Navigation
+   ============================================================ */
 .tools-nav {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -361,9 +457,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 @media (min-width: 768px) {
-    .tools-nav {
-        grid-template-columns: repeat(4, 1fr);
-    }
+    .tools-nav { grid-template-columns: repeat(4, 1fr); }
 }
 
 .nav-item {
@@ -400,7 +494,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
     margin-top: 4px;
 }
 
-/* Documentation Footer (Sandbox specific) */
+/* ============================================================
+   Documentation Footer
+   ============================================================ */
 .doc-footer {
     margin-top: 32px;
     padding-top: 20px;
@@ -426,9 +522,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     line-height: 1.5;
 }
 
-.doc-notes strong {
-    color: var(--text-main);
-}
+.doc-notes strong { color: var(--text-main); }
 
 .doc-links {
     display: flex;
@@ -455,4 +549,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .btn-doc:hover {
     background-color: rgba(51, 65, 85, 0.8);
     border-color: var(--accent-blue);
+}
+
+.link-accent {
+    color: var(--accent-blue);
+    text-decoration: underline;
 }

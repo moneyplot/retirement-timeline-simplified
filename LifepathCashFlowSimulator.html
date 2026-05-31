@@ -28,52 +28,53 @@
     </div>
 
     <div class="layout-split">
-        <!-- Left Side: Chart Placeholder -->
+
+        <!-- Chart -->
         <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Stochastic Trajectory Projection</span>
-                <button class="btn-lock" id="main-chart-lock" style="height: 28px; padding: 0 12px; font-size: 0.8rem; width: auto;">Lock Scale for Comparison</button>
+            <div class="chart-header">
+                <span class="chart-label">Stochastic Trajectory Projection</span>
+                <button class="btn-lock btn-lock-chart" id="main-chart-lock">Lock Scale for Comparison</button>
             </div>
             <div class="chart-container">
                 <canvas id="lifepathChart"></canvas>
-                <!-- Center absolute overlay for initial state -->
-                <div id="chart-loader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;">
+                <div id="chart-loader" class="chart-loader">
                     <span class="placeholder-text">Chart initialization pending engine logic...</span>
                 </div>
             </div>
         </div>
 
-        <!-- Right Side: Control Panel Placeholder -->
+        <!-- Controls -->
         <div class="controls">
+
             <div class="control-group">
                 <label class="control-label">Current Age</label>
                 <div class="interactive-row">
-                    <input type="range" id="slider-start-age" min="0" max="100" value="30">
-                    <input type="number" id="box-start-age" class="manual-box" min="0" max="100" value="30">
+                    <input type="range"  id="slider-start-age" min="0" max="100" value="30">
+                    <input type="number" id="box-start-age"    class="manual-box" min="0" max="100" value="30">
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label">Life Expectancy</label>
                 <div class="interactive-row">
-                    <input type="range" id="slider-end-age" min="0" max="120" value="95">
-                    <input type="number" id="box-end-age" class="manual-box" min="0" max="120" value="95">
+                    <input type="range"  id="slider-end-age" min="0" max="120" value="95">
+                    <input type="number" id="box-end-age"    class="manual-box" min="0" max="120" value="95">
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" id="label-principal">Starting Balance: $0</label>
                 <div class="interactive-row">
-                    <input type="range" id="input-principal" min="0" max="1000000" step="10000" value="0">
-                    <input type="number" id="box-principal" class="manual-box" min="0" step="1000" value="0" placeholder="$">
+                    <input type="range"  id="input-principal" min="0" max="1000000" step="10000" value="0">
+                    <input type="number" id="box-principal"   class="manual-box" min="0" step="1000" value="0" placeholder="$">
                 </div>
             </div>
 
             <div class="control-group">
                 <label class="control-label" id="label-growth">Real Growth Rate during accumulation: 3.0%</label>
                 <div class="interactive-row">
-                    <input type="range" id="input-growth" min="-3.0" max="7.0" step="0.5" value="3.0">
-                    <input type="number" id="box-growth" class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
+                    <input type="range"  id="input-growth" min="-3.0" max="7.0" step="0.5" value="3.0">
+                    <input type="number" id="box-growth"   class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
                 </div>
             </div>
 
@@ -81,28 +82,32 @@
                 <span>More Parameters</span>
                 <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-            
+
             <div class="advanced-content" id="advanced-panel">
+
+                <!-- Decumulation Growth Rate -->
                 <div class="control-group">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="section-header">
                         <label class="control-label" id="label-growth-dec">Real Growth Rate (Decumulation): 3.0%</label>
-                        <button class="btn-lock" id="btn-link-rates" style="width: auto; height: 24px; padding: 0 8px; font-size: 0.75rem;">Link to Accumulation</button>
+                        <button class="btn-lock btn-lock-sm" id="btn-link-rates">Link to Accumulation</button>
                     </div>
                     <div class="interactive-row">
-                        <input type="range" id="input-growth-dec" min="-3.0" max="7.0" step="0.5" value="3.0">
-                        <input type="number" id="box-growth-dec" class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
+                        <input type="range"  id="input-growth-dec" min="-3.0" max="7.0" step="0.5" value="3.0">
+                        <input type="number" id="box-growth-dec"   class="manual-box" min="-5.0" max="15.0" step="0.1" value="3.0">
                     </div>
                 </div>
 
+                <!-- Legacy Floor -->
                 <div class="control-group">
                     <label class="control-label" id="label-legacy-floor">Desired Legacy Floor: $0</label>
                     <div class="interactive-row">
-                        <input type="range" id="slider-legacy-floor" min="0" max="1000000" step="50000" value="0">
-                        <input type="number" id="box-legacy-floor" class="manual-box" min="0" max="5000000" step="50000" value="0" placeholder="$">
+                        <input type="range"  id="slider-legacy-floor" min="0" max="1000000" step="50000" value="0">
+                        <input type="number" id="box-legacy-floor"    class="manual-box" min="0" max="5000000" step="50000" value="0" placeholder="$">
                     </div>
                 </div>
 
-                <div class="advanced-row-x" style="margin-top: 8px;">
+                <!-- Chart X-Axis Bounds -->
+                <div class="advanced-row-x">
                     <div class="x-input-pair">
                         <div class="control-group">
                             <label class="control-label">Chart Min Age</label>
@@ -114,15 +119,17 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-lock" id="btn-lock-x" style="width: 100%; margin-top: 4px;">Lock Current X</button>
+                <button class="btn-lock btn-lock-full" id="btn-lock-x">Lock Current X</button>
 
-                <div class="control-group" style="margin-top: 8px;">
+                <!-- Chart Y-Axis (Net Worth) -->
+                <div class="control-group">
                     <label class="control-label">Chart Max Net Worth ($)</label>
                     <input type="number" id="box-y-max" step="100000" min="0" value="" placeholder="Auto (Peak Net Worth)">
                 </div>
-                <button class="btn-lock" id="btn-lock-y" style="width: 100%; margin-top: 4px;">Lock Current Y</button>
+                <button class="btn-lock btn-lock-full" id="btn-lock-y">Lock Current Y</button>
 
-                <div class="advanced-row-y" style="margin-top: 8px;">
+                <!-- Chart Left Y-Axis (Cash Flow) -->
+                <div class="advanced-row-y">
                     <div class="x-input-pair">
                         <div class="control-group">
                             <label class="control-label">Chart Min Flow ($)</label>
@@ -134,33 +141,36 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-lock" id="btn-lock-y-left" style="width: 100%; margin-top: 4px;">Lock Current Left Y</button>
+                <button class="btn-lock btn-lock-full" id="btn-lock-y-left">Lock Current Left Y</button>
 
-                <!-- Dynamic External Events -->
-                <div style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <!-- Social Security / Pensions -->
+                <div class="section-divider">
+                    <div class="section-header">
                         <label class="control-label">Social Security / Pensions</label>
-                        <button class="btn-lock" id="btn-add-ss" style="width: auto; height: 24px; padding: 0 8px; font-size: 0.75rem;">+ Add</button>
+                        <button class="btn-lock btn-lock-sm" id="btn-add-ss">+ Add</button>
                     </div>
-                    <div id="ss-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                    <div id="ss-list" class="event-list"></div>
                 </div>
 
-                <div style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <!-- Windfalls -->
+                <div class="section-divider">
+                    <div class="section-header">
                         <label class="control-label">One-time Windfalls</label>
-                        <button class="btn-lock" id="btn-add-windfall" style="width: auto; height: 24px; padding: 0 8px; font-size: 0.75rem;">+ Add</button>
+                        <button class="btn-lock btn-lock-sm" id="btn-add-windfall">+ Add</button>
                     </div>
-                    <div id="windfall-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                    <div id="windfall-list" class="event-list"></div>
                 </div>
-            </div>
+
+            </div><!-- /advanced-panel -->
 
             <div id="milestone-container" class="milestone-list"></div>
             <button id="add-event-btn" class="btn-add-event">+ Add Life Event (Milestone)</button>
-        </div>
-    </div>
+
+        </div><!-- /controls -->
+    </div><!-- /layout-split -->
 
     <nav class="tools-nav">
-        <a href="index.html" class="nav-item" title="Static, Closed-form calculus or diff r_acc from r_dc">
+        <a href="index.html" class="nav-item" title="Static, Closed-form calculus">
             1. Macro Sandbox
             <span>High-level Engine</span>
         </a>
@@ -177,781 +187,9 @@
             <span>Lifepath Volatility</span>
         </a>
     </nav>
-</div>
 
-<script>
-    const milestoneContainer = document.getElementById('milestone-container');
-    const addEventBtn = document.getElementById('add-event-btn');
-    const loader = document.getElementById('chart-loader');
+</div><!-- /container -->
 
-    const sliderStartAge = document.getElementById('slider-start-age');
-    const boxStartAge = document.getElementById('box-start-age');
-    const mWorkYears = document.getElementById('metric-work-years');
-    const mRetireAge = document.getElementById('metric-retire-age');
-    const mPeakNw = document.getElementById('metric-peak-nw');
-
-    const sliderEndAge = document.getElementById('slider-end-age');
-    const boxEndAge = document.getElementById('box-end-age');
-    const inputPrincipal = document.getElementById('input-principal');
-    const boxPrincipal = document.getElementById('box-principal');
-    const inputGrowth = document.getElementById('input-growth');
-    const boxGrowth = document.getElementById('box-growth');
-    const inputGrowthDec = document.getElementById('input-growth-dec');
-    const boxGrowthDec = document.getElementById('box-growth-dec');
-    const btnLinkRates = document.getElementById('btn-link-rates');
-    const btnAdvanced = document.getElementById('advanced-button');
-    const panelAdvanced = document.getElementById('advanced-panel');
-    const sliderLegacyFloor = document.getElementById('slider-legacy-floor');
-    const boxLegacyFloor = document.getElementById('box-legacy-floor');
-    const boxAxisMin = document.getElementById('box-axis-min');
-    const boxAxisMax = document.getElementById('box-axis-max');
-    const boxYMax = document.getElementById('box-y-max');
-    const boxYLeftMin = document.getElementById('box-y-left-min');
-    const boxYLeftMax = document.getElementById('box-y-left-max');
-    const mainLockBtn = document.getElementById('main-chart-lock');
-    const btnLockX = document.getElementById('btn-lock-x');
-    const btnLockY = document.getElementById('btn-lock-y');
-    const btnLockYLeft = document.getElementById('btn-lock-y-left');
-    
-    const ssList = document.getElementById('ss-list');
-    const windfallList = document.getElementById('windfall-list');
-    const btnAddSs = document.getElementById('btn-add-ss');
-    const btnAddWindfall = document.getElementById('btn-add-windfall');
-
-    let chartInstance = null;
-    let ratesLinked = false;
-    let computedMinFlowCache = 0;
-    let computedPeakFlowCache = 0;
-    let computedPeakCache = 0;
-    
-    // Internal data structure
-    let milestones = [];
-    let ssEvents = [];
-    let windfallEvents = [];
-
-    function initChart() {
-        const ctx = document.getElementById('lifepathChart').getContext('2d');
-        chartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [
-                    {
-                        label: 'Inflow (Income)',
-                        data: [],
-                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                        borderColor: '#10b981',
-                        borderWidth: 1,
-                        stack: 'flow'
-                    },
-                    {
-                        label: 'Outflow (Spending)',
-                        data: [],
-                        backgroundColor: 'rgba(239, 68, 68, 0.6)',
-                        borderColor: '#ef4444',
-                        borderWidth: 1,
-                        stack: 'flow'
-                    },
-                    {
-                        label: 'Asset Growth',
-                        data: [],
-                        backgroundColor: 'rgba(139, 92, 246, 0.6)',
-                        borderColor: '#8B5CF6',
-                        borderWidth: 1,
-                        stack: 'flow'
-                    },
-                    {
-                        label: 'Projected Net Worth',
-                        data: [],
-                        type: 'line',
-                        borderColor: '#3b82f6',
-                        borderWidth: 3,
-                        pointRadius: 0,
-                        yAxisID: 'yNetWorth',
-                        fill: false,
-                        tension: 0.1,
-                        zIndex: 10
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        type: 'linear',
-                        grid: { color: '#334155' },
-                        ticks: { color: '#94a3b8', font: { size: 10 } },
-                        title: { display: true, text: 'Age', color: '#94a3b8' }
-                    },
-                    y: {
-                        stacked: true,
-                        grid: { color: '#334155' },
-                        beginAtZero: true,
-                        ticks: { 
-                            color: '#94a3b8',
-                            callback: (v) => '$' + Math.abs(v).toLocaleString()
-                        },
-                        title: { display: true, text: 'Annual Cash Flow ($)', color: '#94a3b8' }
-                    },
-                    yNetWorth: {
-                        position: 'right',
-                        grid: { display: false },
-                        min: 0,
-                        ticks: {
-                            color: '#3b82f6',
-                            callback: (v) => v >= 1000000 ? '$' + (v / 1000000).toFixed(1) + 'M' : '$' + (v / 1000).toFixed(0) + 'k'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: { labels: { color: '#f8fafc' } },
-                    tooltip: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false,
-                        callbacks: {
-                            title: (context) => 'Age ' + context[0].parsed.x.toFixed(1),
-                            label: (context) => {
-                                let label = context.dataset.label || '';
-                                if (label) label += ': ';
-                                label += '$' + Math.abs(context.parsed.y).toLocaleString();
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        loader.style.display = 'none';
-    }
-
-    function getMilestone(age) {
-        return milestones.filter(m => m.age <= age).pop() || milestones[0];
-    }
-
-    function simulateLife(startAge, endAge, principal, rAcc, rDec, rAge, planningEndAge) {
-        const labels = [];
-        const inflowData = [];
-        const growthData = [];
-        const outflowData = [];
-        const nwData = [];
-        
-        let balance = principal;
-        let peakNw = principal;
-        let peakFlow = 0;
-        let minFlow = 0;
-
-        const k = Math.floor(rAge);
-        const delta = rAge - k;
-
-        for (let t = startAge; t <= endAge; t++) {
-            labels.push(t);
-
-            // Line chart reflects state at the start of age t
-            if (t <= planningEndAge + 1) {
-                nwData.push({ x: t, y: balance });
-            } else {
-                nwData.push({ x: t, y: null });
-            }
-
-            if (t > planningEndAge) {
-                inflowData.push({ x: t, y: null });
-                outflowData.push({ x: t, y: null });
-                growthData.push({ x: t, y: null });
-                continue;
-            }
-            
-            const startBal = balance;
-            const m = getMilestone(t);
-            
-            let passive = ssEvents.reduce((acc, ss) => acc + (t >= ss.age ? ss.amt : 0), 0);
-            let windfall = windfallEvents.reduce((acc, wf) => {
-                if (t === wf.age) return acc + wf.amt;
-                return acc;
-            }, 0);
-
-            let growth = 0;
-
-            if (t < k) {
-                // Full working year
-                inflowData.push({ x: t, y: m.income + passive + windfall });
-                outflowData.push({ x: t, y: -m.spending });
-                balance = balance * (1 + rAcc) + m.savings + passive + windfall;
-                growth = balance - startBal - m.savings - passive - windfall;
-                peakNw = Math.max(peakNw, balance);
-            } else if (t === k) {
-                // Transition year (Fractional retirement)
-                const workFrac = delta;
-                const retireFrac = 1 - delta;
-
-                inflowData.push({ x: t, y: (m.income * workFrac) + passive + windfall });
-                outflowData.push({ x: t, y: -m.spending });
-
-                const balanceMid = balance * Math.pow(1 + rAcc, workFrac) + (m.savings * workFrac) + (passive * workFrac) + (windfall * workFrac);
-                
-                // Insert intermediate peak point for the line chart
-                if (delta > 0 && t <= planningEndAge) {
-                    nwData.push({ x: t + delta, y: balanceMid });
-                }
-
-                balance = (balanceMid - m.spending * retireFrac + (passive * retireFrac) + (windfall * retireFrac)) * Math.pow(1 + rDec, retireFrac);
-                growth = balance - startBal - (m.savings * workFrac) + (m.spending * retireFrac) - passive - windfall;
-                peakNw = Math.max(peakNw, balanceMid, balance);
-            } else {
-                // Full retirement year
-                inflowData.push({ x: t, y: passive + windfall });
-                outflowData.push({ x: t, y: -m.spending });
-                balance = (balance - m.spending + passive + windfall) * (1 + rDec);
-                growth = balance - startBal + m.spending - passive - windfall;
-                peakNw = Math.max(peakNw, balance);
-            }
-            growthData.push({ x: t, y: growth });
-            // Peak flow for stacked bars is sum of positive contributors (Inflow + Growth)
-            let currentPositiveFlow = Math.max(0, (inflowData[inflowData.length-1].y || 0)) + Math.max(0, (growthData[growthData.length-1].y || 0));
-            peakFlow = Math.max(peakFlow, currentPositiveFlow);
-            let currentNegativeFlow = (outflowData[outflowData.length-1].y || 0);
-            minFlow = Math.min(minFlow, currentNegativeFlow);
-        }
-
-        return { labels, inflowData, growthData, outflowData, nwData, finalBalance: balance, peakNw, peakFlow, minFlow };
-    }
-
-    function updateSimulation() {
-        if (!chartInstance) initChart();
-        if (milestones.length === 0) return;
-
-        const currentAge = parseInt(boxStartAge.value);
-        const stopAge = parseInt(boxEndAge.value);
-        const principal = parseFloat(boxPrincipal.value) || 0;
-        const rAcc = (parseFloat(boxGrowth.value) || 0) / 100;
-        const rDec = (parseFloat(boxGrowthDec.value) || 0) / 100;
-        const floor = parseFloat(boxLegacyFloor.value) || 0;
-
-        // Numerical Solver (Bisection)
-        let w = 0;
-        // Allow working through the final year by extending horizon to start of age stopAge + 1
-        const horizon = stopAge - currentAge + 1;
-        const resAtH = simulateLife(currentAge, stopAge, principal, rAcc, rDec, currentAge + horizon, stopAge);
-        const resAtStart = simulateLife(currentAge, stopAge, principal, rAcc, rDec, currentAge, stopAge);
-
-        if (resAtStart.finalBalance >= floor) {
-            w = 0;
-        } else if (resAtH.finalBalance < floor) {
-            w = horizon;
-        } else {
-            let low = currentAge, high = currentAge + horizon;
-            for (let i = 0; i < 60; i++) {
-                let mid = (low + high) / 2;
-                let test = simulateLife(currentAge, stopAge, principal, rAcc, rDec, mid, stopAge);
-                if (test.finalBalance < floor) low = mid;
-                else high = mid;
-            }
-            w = ((low + high) / 2) - currentAge;
-        }
-
-        const rAge = currentAge + w;
-        const finalSim = simulateLife(currentAge, stopAge, principal, rAcc, rDec, rAge, stopAge);
-        computedPeakCache = finalSim.peakNw;
-        computedMinFlowCache = finalSim.minFlow;
-        computedPeakFlowCache = finalSim.peakFlow;
-
-        // Update Metrics
-        mWorkYears.innerText = w.toFixed(1) + ' Years';
-        if (w >= (stopAge - currentAge) && resAtH.finalBalance < floor) {
-            mRetireAge.innerText = 'Never';
-        } else {
-            mRetireAge.innerText = 'Age ' + rAge.toFixed(1);
-        }
-        mPeakNw.innerText = formatCurrency(finalSim.peakNw);
-
-        // Labels updates for context
-        document.getElementById('label-principal').innerText = 'Starting Balance: ' + formatCurrency(principal);
-        document.getElementById('label-growth').innerText = 'Real Growth Rate during accumulation: ' + (rAcc * 100).toFixed(1) + '%';
-        document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + (rDec * 100).toFixed(1) + '%';
-        document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(floor);
-
-        // View Clamping
-        let axisMin = boxAxisMin.value !== "" ? parseInt(boxAxisMin.value) : currentAge;
-        let axisMax = boxAxisMax.value !== "" ? parseInt(boxAxisMax.value) : stopAge + 1;
-        let yMaxConstraint = boxYMax.value !== "" ? parseFloat(boxYMax.value) : undefined;
-        let yLeftMinConstraint = boxYLeftMin.value !== "" ? parseFloat(boxYLeftMin.value) : undefined;
-        let yLeftMaxConstraint = boxYLeftMax.value !== "" ? parseFloat(boxYLeftMax.value) : undefined;
-
-        const viewSim = simulateLife(currentAge, Math.max(stopAge, axisMax), principal, rAcc, rDec, rAge, stopAge);
-
-        chartInstance.data.labels = viewSim.labels;
-        chartInstance.data.datasets[0].data = viewSim.inflowData;
-        chartInstance.data.datasets[1].data = viewSim.outflowData;
-        chartInstance.data.datasets[2].data = viewSim.growthData;
-        chartInstance.data.datasets[3].data = viewSim.nwData;
-
-        chartInstance.options.scales.x.min = axisMin;
-        chartInstance.options.scales.x.max = axisMax;
-        chartInstance.options.scales.y.min = yLeftMinConstraint;
-        chartInstance.options.scales.y.max = yLeftMaxConstraint;
-        chartInstance.options.scales.yNetWorth.max = yMaxConstraint;
-        
-        chartInstance.update('none'); // Use 'none' for instant reactive feel
-        updateButtonStates();
-        updateURLParams();
-    }
-
-    function updateURLParams() {
-        const params = new URLSearchParams();
-        params.set('startAge', boxStartAge.value);
-        params.set('endAge', boxEndAge.value);
-        params.set('principal', boxPrincipal.value);
-        params.set('growth', boxGrowth.value);
-        params.set('growthDec', boxGrowthDec.value);
-        params.set('legacyFloor', boxLegacyFloor.value);
-        params.set('linked', ratesLinked);
-        params.set('ss', JSON.stringify(ssEvents.map(e => [e.amt, e.age])));
-        params.set('wf', JSON.stringify(windfallEvents.map(e => [e.amt, e.age])));
-        if(boxAxisMin.value !== "") params.set('xMin', boxAxisMin.value);
-        if(boxAxisMax.value !== "") params.set('xMax', boxAxisMax.value);
-        if(boxYMax.value !== "") params.set('yMax', boxYMax.value);
-        if(boxYLeftMin.value !== "") params.set('yLeftMin', boxYLeftMin.value);
-        if(boxYLeftMax.value !== "") params.set('yLeftMax', boxYLeftMax.value);
-        
-        // Compact milestones for URL: [age, income, savings, spending]
-        const mData = milestones.map(m => [m.age, m.income, m.savings, m.spending]);
-        params.set('m', JSON.stringify(mData));
-        
-        const newUrl = `${window.location.pathname}?${params.toString()}`;
-        window.history.replaceState({}, '', newUrl);
-    }
-
-    function loadParamsFromURL() {
-        const params = new URLSearchParams(window.location.search);
-        if (params.has('startAge')) boxStartAge.value = sliderStartAge.value = params.get('startAge');
-        if (params.has('endAge')) boxEndAge.value = sliderEndAge.value = params.get('endAge');
-        if (params.has('principal')) boxPrincipal.value = inputPrincipal.value = params.get('principal');
-        if (params.has('growth')) boxGrowth.value = inputGrowth.value = params.get('growth');
-        if (params.has('growthDec')) boxGrowthDec.value = inputGrowthDec.value = params.get('growthDec');
-        if (params.has('legacyFloor')) boxLegacyFloor.value = sliderLegacyFloor.value = params.get('legacyFloor');
-        if (params.has('xMin')) boxAxisMin.value = params.get('xMin');
-        if (params.has('xMax')) boxAxisMax.value = params.get('xMax');
-        if (params.has('yMax')) boxYMax.value = params.get('yMax');
-        if (params.has('yLeftMin')) boxYLeftMin.value = params.get('yLeftMin');
-        if (params.has('yLeftMax')) boxYLeftMax.value = params.get('yLeftMax');
-        if (params.has('ss')) {
-            const data = JSON.parse(params.get('ss'));
-            ssEvents = data.map(d => ({ id: Math.random().toString(36).substr(2,9), amt: d[0], age: d[1] }));
-        }
-        if (params.has('wf')) {
-            const data = JSON.parse(params.get('wf'));
-            windfallEvents = data.map(d => ({ id: Math.random().toString(36).substr(2,9), amt: d[0], age: d[1] }));
-        }
-        
-        if (params.get('linked') === 'true') {
-            ratesLinked = true;
-            btnLinkRates.textContent = "Rates Linked";
-            btnLinkRates.classList.add('locked');
-            inputGrowthDec.disabled = boxGrowthDec.disabled = true;
-        }
-
-        if (boxAxisMin.value !== "" || boxAxisMax.value !== "" || boxYMax.value !== "" || boxYLeftMin.value !== "" || boxYLeftMax.value !== "") {
-            mainLockBtn.textContent = "Unlock Auto-Scale";
-            mainLockBtn.classList.add('locked');
-        }
-
-        if (params.has('m')) {
-            try {
-                const mData = JSON.parse(params.get('m'));
-                milestones = mData.map(m => ({
-                    id: Math.random().toString(36).substr(2, 9),
-                    age: m[0],
-                    income: m[1],
-                    savings: m[2],
-                    spending: m[3]
-                }));
-            } catch (e) { console.error("Failed to parse milestones from URL", e); }
-        }
-    }
-
-    function linkInputs(slider, box, labelUpdateFn) {
-        slider.addEventListener('input', () => {
-            box.value = slider.value;
-            if (labelUpdateFn) labelUpdateFn(slider.value);
-            updateSimulation();
-        });
-        box.addEventListener('change', () => {
-            if (box.value === "") box.value = slider.value;
-            slider.value = box.value;
-            if (labelUpdateFn) labelUpdateFn(box.value);
-            updateSimulation();
-        });
-    }
-
-    btnAdvanced.addEventListener('click', () => {
-        btnAdvanced.classList.toggle('open');
-        panelAdvanced.classList.toggle('visible');
-    });
-
-    btnLinkRates.addEventListener('click', () => {
-        ratesLinked = !ratesLinked;
-        if (ratesLinked) {
-            btnLinkRates.textContent = "Rates Linked";
-            btnLinkRates.classList.add('locked');
-            
-            boxGrowthDec.value = boxGrowth.value;
-            inputGrowthDec.value = inputGrowth.value;
-            inputGrowthDec.disabled = true;
-            boxGrowthDec.disabled = true;
-        } else {
-            btnLinkRates.textContent = "Link to Accumulation";
-            btnLinkRates.classList.remove('locked');
-            inputGrowthDec.disabled = false;
-            boxGrowthDec.disabled = false;
-        }
-        updateSimulation();
-    });
-
-    function updateButtonStates() {
-        if (boxAxisMin.value !== "" || boxAxisMax.value !== "") {
-            btnLockX.textContent = "Unlock Auto";
-            btnLockX.classList.add('locked');
-        } else {
-            btnLockX.textContent = "Lock Current";
-            btnLockX.classList.remove('locked');
-        }
-
-        if (boxYMax.value !== "") {
-            btnLockY.textContent = "Unlock Auto";
-            btnLockY.classList.add('locked');
-        } else {
-            btnLockY.textContent = "Lock Current";
-            btnLockY.classList.remove('locked');
-        }
-
-        if (boxYLeftMin.value !== "" || boxYLeftMax.value !== "") {
-            btnLockYLeft.textContent = "Unlock Auto";
-            btnLockYLeft.classList.add('locked');
-        } else {
-            btnLockYLeft.textContent = "Lock Current";
-            btnLockYLeft.classList.remove('locked');
-        }
-    }
-
-    btnLockX.addEventListener('click', () => {
-        if (boxAxisMin.value !== "" || boxAxisMax.value !== "") {
-            boxAxisMin.value = "";
-            boxAxisMax.value = "";
-        } else {
-            boxAxisMin.value = parseInt(boxStartAge.value) || 0;
-            boxAxisMax.value = (parseInt(boxEndAge.value) || 95) + 1;
-        }
-        updateSimulation();
-    });
-
-    btnLockY.addEventListener('click', () => {
-        if (boxYMax.value !== "") {
-            boxYMax.value = "";
-        } else if (computedPeakCache > 0) {
-            const rawPeak = computedPeakCache;
-            let snappedCeiling = Math.round(rawPeak);
-            if (rawPeak >= 1000000) snappedCeiling = Math.ceil(rawPeak / 250000) * 250000;
-            else if (rawPeak >= 250000) snappedCeiling = Math.ceil(rawPeak / 50000) * 50000;
-            else snappedCeiling = Math.ceil(rawPeak / 10000) * 10000;
-            boxYMax.value = snappedCeiling;
-        }
-        updateSimulation();
-    });
-
-    btnLockYLeft.addEventListener('click', () => {
-        if (boxYLeftMin.value !== "" || boxYLeftMax.value !== "") {
-            boxYLeftMin.value = "";
-            boxYLeftMax.value = "";
-        } else {
-            if (computedMinFlowCache < 0) {
-                const rawMin = computedMinFlowCache;
-                let snappedFloor = Math.floor(rawMin);
-                if (rawMin <= -100000) snappedFloor = Math.floor(rawMin / 25000) * 25000;
-                else snappedFloor = Math.floor(rawMin / 5000) * 5000;
-                boxYLeftMin.value = snappedFloor;
-            } else {
-                boxYLeftMin.value = "0";
-            }
-
-            const rawPeak = computedPeakFlowCache;
-            let snappedCeiling = Math.round(rawPeak);
-            if (rawPeak >= 500000) snappedCeiling = Math.ceil(rawPeak / 100000) * 100000;
-            else if (rawPeak >= 100000) snappedCeiling = Math.ceil(rawPeak / 25000) * 25000;
-            else if (rawPeak >= 50000) snappedCeiling = Math.ceil(rawPeak / 10000) * 10000;
-            else snappedCeiling = Math.ceil(rawPeak / 5000) * 5000;
-            boxYLeftMax.value = snappedCeiling;
-        }
-        updateSimulation();
-    });
-
-    mainLockBtn.addEventListener('click', () => {
-        // If either X or Y is currently unlocked, lock everything to current view
-        if (boxAxisMin.value === "" || boxAxisMax.value === "" || boxYMax.value === "" || boxYLeftMin.value === "" || boxYLeftMax.value === "") {
-            boxAxisMin.value = parseInt(boxStartAge.value) || 0;
-            boxAxisMax.value = (parseInt(boxEndAge.value) || 95) + 1;
-            
-            if (computedPeakCache > 0) {
-                const rawPeak = computedPeakCache;
-                let snappedCeiling = Math.round(rawPeak);
-                if (rawPeak >= 1000000) snappedCeiling = Math.ceil(rawPeak / 250000) * 250000;
-                else if (rawPeak >= 250000) snappedCeiling = Math.ceil(rawPeak / 50000) * 50000;
-                else snappedCeiling = Math.ceil(rawPeak / 10000) * 10000;
-                boxYMax.value = snappedCeiling;
-            }
-
-            if (computedMinFlowCache < 0) {
-                const rawMin = computedMinFlowCache;
-                let snappedFloor = Math.floor(rawMin);
-                if (rawMin <= -100000) snappedFloor = Math.floor(rawMin / 25000) * 25000;
-                else snappedFloor = Math.floor(rawMin / 5000) * 5000;
-                boxYLeftMin.value = snappedFloor;
-            } else {
-                boxYLeftMin.value = "0";
-            }
-
-            const rawPeakFlow = computedPeakFlowCache;
-            let snappedCeilingFlow = Math.round(rawPeakFlow);
-            if (rawPeakFlow >= 500000) snappedCeilingFlow = Math.ceil(rawPeakFlow / 100000) * 100000;
-            else if (rawPeakFlow >= 100000) snappedCeilingFlow = Math.ceil(rawPeakFlow / 25000) * 25000;
-            else if (rawPeakFlow >= 50000) snappedCeilingFlow = Math.ceil(rawPeakFlow / 10000) * 10000;
-            else snappedCeilingFlow = Math.ceil(rawPeakFlow / 5000) * 5000;
-            boxYLeftMax.value = snappedCeilingFlow;
-
-            mainLockBtn.textContent = "Unlock Auto-Scale";
-            mainLockBtn.classList.add('locked');
-        } else {
-            boxAxisMin.value = "";
-            boxAxisMax.value = "";
-            boxYMax.value = "";
-            boxYLeftMin.value = "";
-            boxYLeftMax.value = "";
-            mainLockBtn.textContent = "Lock Scale for Comparison";
-            mainLockBtn.classList.remove('locked');
-        }
-        updateSimulation();
-    });
-
-    function createMilestoneUI(milestone) {
-        const block = document.createElement('div');
-        block.className = 'milestone-block';
-        block.dataset.id = milestone.id;
-
-        block.innerHTML = `
-            <div class="milestone-header">
-                <div class="milestone-title">Event Milestone</div>
-                <button class="btn-delete" onclick="removeMilestone('${milestone.id}')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                </button>
-            </div>
-            <div class="input-row">
-                <div class="control-group">
-                    <label class="control-label">Start Age</label>
-                    <input type="number" class="inp-age" value="${milestone.age}" min="0" max="120">
-                </div>
-                <div class="control-group">
-                    <label class="control-label">Gross Income</label>
-                    <input type="number" class="inp-income" value="${milestone.income}" step="1000">
-                </div>
-            </div>
-            <div class="input-row">
-                <div class="control-group">
-                    <label class="control-label">Lifestyle Spending</label>
-                    <input type="number" class="inp-spending" value="${milestone.spending}" step="1000">
-                </div>
-                <div class="control-group">
-                    <label class="control-label">Annual Savings</label>
-                    <input type="number" class="inp-savings" value="${milestone.savings}" step="1000">
-                </div>
-            </div>
-        `;
-
-        // Bind linked math logic (I = S + C)
-        const inpAge = block.querySelector('.inp-age');
-        const inpIncome = block.querySelector('.inp-income');
-        const inpSpending = block.querySelector('.inp-spending');
-        const inpSavings = block.querySelector('.inp-savings');
-
-        inpAge.addEventListener('change', () => syncDataAndSort());
-        
-        inpIncome.addEventListener('input', () => {
-            // Adjust savings when income moves
-            inpSavings.value = inpIncome.value - inpSpending.value;
-            syncDataAndSort();
-        });
-
-        inpSpending.addEventListener('input', () => {
-            // Adjust savings when spending moves
-            inpSavings.value = inpIncome.value - inpSpending.value;
-            syncDataAndSort();
-        });
-
-        inpSavings.addEventListener('input', () => {
-            // Keeping Income fixed and letting Spending absorb the change per fallback logic
-            inpSpending.value = inpIncome.value - inpSavings.value;
-            syncDataAndSort();
-        });
-
-        return block;
-    }
-
-    function addMilestone(age = 30, income = 60000, savings = 15000, spending = 45000) {
-        const milestone = {
-            id: Math.random().toString(36).substr(2, 9),
-            age: age,
-            income: income,
-            savings: savings,
-            spending: spending
-        };
-        
-        milestones.push(milestone);
-        renderMilestones();
-    }
-
-    function removeMilestone(id) {
-        if (milestones.length <= 1) return; // Keep at least one milestone
-        milestones = milestones.filter(m => m.id !== id);
-        renderMilestones();
-    }
-
-    function syncDataAndSort() {
-        // 1. Capture current values from DOM
-        const blocks = document.querySelectorAll('.milestone-block');
-        const updatedMilestones = [];
-
-        blocks.forEach(block => {
-            updatedMilestones.push({
-                id: block.dataset.id,
-                age: parseInt(block.querySelector('.inp-age').value) || 0,
-                income: parseFloat(block.querySelector('.inp-income').value) || 0,
-                spending: parseFloat(block.querySelector('.inp-spending').value) || 0,
-                savings: parseFloat(block.querySelector('.inp-savings').value) || 0
-            });
-        });
-
-        // 2. Sort chronologically
-        updatedMilestones.sort((a, b) => a.age - b.age);
-        
-        // 3. Update global state
-        milestones = updatedMilestones;
-        
-        // 4. Update Simulation
-        updateSimulation();
-    }
-
-    function renderMilestones() {
-        // Preserve current scroll position
-        const scrollPos = milestoneContainer.parentElement.scrollTop;
-        
-        milestoneContainer.innerHTML = '';
-        
-        // Sort before rendering to ensure DOM matches state
-        milestones.sort((a, b) => a.age - b.age);
-
-        milestones.forEach(m => {
-            milestoneContainer.appendChild(createMilestoneUI(m));
-        });
-
-        milestoneContainer.parentElement.scrollTop = scrollPos;
-        updateSimulation();
-    }
-
-    addEventBtn.addEventListener('click', () => {
-        // Default to adding a milestone 10 years after the last one
-        const lastAge = milestones.length > 0 ? milestones[milestones.length - 1].age : 30;
-        const lastIncome = milestones.length > 0 ? milestones[milestones.length - 1].income : 60000;
-        const lastSpending = milestones.length > 0 ? milestones[milestones.length - 1].spending : 45000;
-        const lastSavings = milestones.length > 0 ? milestones[milestones.length - 1].savings : 15000;
-        
-        addMilestone(lastAge + 10, lastIncome, lastSavings, lastSpending);
-    });
-
-    const formatCurrency = (num) => '$' + Math.round(num).toLocaleString();
-
-    linkInputs(sliderStartAge, boxStartAge);
-    linkInputs(sliderEndAge, boxEndAge);
-    linkInputs(inputPrincipal, boxPrincipal, (val) => {
-        document.getElementById('label-principal').innerText = 'Starting Balance: ' + formatCurrency(val);
-    });
-    linkInputs(inputGrowth, boxGrowth, (val) => {
-        document.getElementById('label-growth').innerText = 'Real Growth Rate during accumulation: ' + parseFloat(val).toFixed(1) + '%';
-        if (ratesLinked) {
-            inputGrowthDec.value = boxGrowthDec.value = val;
-            document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + parseFloat(val).toFixed(1) + '%';
-        }
-    });
-    linkInputs(inputGrowthDec, boxGrowthDec, (val) => {
-        document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + parseFloat(val).toFixed(1) + '%';
-    });
-    linkInputs(sliderLegacyFloor, boxLegacyFloor, (val) => {
-        document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(val);
-    });
-
-    // Set initial labels
-    document.getElementById('label-principal').innerText = 'Starting Balance: ' + formatCurrency(boxPrincipal.value);
-    document.getElementById('label-growth').innerText = 'Real Growth Rate during accumulation: ' + parseFloat(boxGrowth.value).toFixed(1) + '%';
-    document.getElementById('label-growth-dec').innerText = 'Real Growth Rate (Decumulation): ' + parseFloat(boxGrowthDec.value).toFixed(1) + '%';
-    document.getElementById('label-legacy-floor').innerText = 'Desired Legacy Floor: ' + formatCurrency(boxLegacyFloor.value);
-
-    boxAxisMin.addEventListener('change', updateSimulation);
-    boxAxisMax.addEventListener('change', updateSimulation);
-    boxYMax.addEventListener('change', updateSimulation);
-    boxYLeftMin.addEventListener('change', updateSimulation);
-    boxYLeftMax.addEventListener('change', updateSimulation);
-
-    function renderDynamicEvents() {
-        ssList.innerHTML = '';
-        ssEvents.forEach(e => ssList.appendChild(createEventUI(e, 'ss')));
-        windfallList.innerHTML = '';
-        windfallEvents.forEach(e => windfallList.appendChild(createEventUI(e, 'wf')));
-    }
-
-    function createEventUI(event, type) {
-        const row = document.createElement('div');
-        row.className = 'interactive-row';
-        row.style.marginBottom = '4px';
-        row.innerHTML = `
-            <input type="number" class="manual-box inp-amt" style="flex: 1;" value="${event.amt}" placeholder="Amount ($)">
-            <input type="number" class="manual-box inp-age" style="width: 60px;" value="${event.age}" placeholder="Age">
-            <button class="btn-delete" style="opacity:0.6; padding:0 4px;">✕</button>
-        `;
-        const inpAmt = row.querySelector('.inp-amt');
-        const inpAge = row.querySelector('.inp-age');
-        const btnDel = row.querySelector('.btn-delete');
-
-        inpAmt.addEventListener('change', () => { event.amt = parseFloat(inpAmt.value) || 0; updateSimulation(); });
-        inpAge.addEventListener('change', () => { event.age = parseInt(inpAge.value) || 0; updateSimulation(); });
-        btnDel.addEventListener('click', () => {
-            if (type === 'ss') ssEvents = ssEvents.filter(x => x.id !== event.id);
-            else windfallEvents = windfallEvents.filter(x => x.id !== event.id);
-            renderDynamicEvents();
-            updateSimulation();
-        });
-        return row;
-    }
-
-    btnAddSs.addEventListener('click', () => {
-        if (ssEvents.length >= 100) return;
-        ssEvents.push({ id: Math.random().toString(36).substr(2,9), amt: 10000, age: 67 });
-        renderDynamicEvents();
-        updateSimulation();
-    });
-
-    btnAddWindfall.addEventListener('click', () => {
-        if (windfallEvents.length >= 100) return;
-        windfallEvents.push({ id: Math.random().toString(36).substr(2,9), amt: 50000, age: 50 });
-        renderDynamicEvents();
-        updateSimulation();
-    });
-
-    // Initialize
-    loadParamsFromURL();
-    if (milestones.length === 0) {
-        addMilestone(30, 60000, 15000, 45000);
-    } else {
-        renderMilestones();
-    }
-    renderDynamicEvents();
-</script>
+<script src="lifepath.js"></script>
 </body>
 </html>
